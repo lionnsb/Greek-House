@@ -1,5 +1,4 @@
-import { getAuth } from "firebase-admin/auth";
-import "@/lib/firebaseAdmin";
+import { getAdminAuth } from "@/lib/firebaseAdmin";
 
 export async function requireAdmin(request: Request) {
   const header = request.headers.get("authorization");
@@ -7,7 +6,7 @@ export async function requireAdmin(request: Request) {
     throw new Error("Missing auth token");
   }
   const token = header.replace("Bearer ", "");
-  const auth = getAuth();
+  const auth = getAdminAuth();
   const decoded = await auth.verifyIdToken(token);
 
   const allowed = (process.env.ADMIN_EMAILS ?? "")
