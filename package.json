@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "deploy": "npm run cf:deploy",
+    "preview": "npm run cf:preview",
     "cf:build": "npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion",
     "cf:deploy": "npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && npx opennextjs-cloudflare deploy",
     "cf:preview": "npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && npx opennextjs-cloudflare preview"
