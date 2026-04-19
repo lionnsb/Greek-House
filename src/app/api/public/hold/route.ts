@@ -1,10 +1,7 @@
 import { addHours } from "date-fns";
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdmin";
 import type { InquiryPayload } from "@/lib/types";
 import { buildSeasonsFromEnv, calculateSeasonalTotal } from "@/lib/seasonPricing";
-import { cleanupExpiredHolds } from "@/lib/cleanupHolds";
-import { sendAdminNewInquiryEmail, sendInquiryReceivedEmail } from "@/lib/mailer";
 
 function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
   return aStart < bEnd && bStart < aEnd;
@@ -12,6 +9,11 @@ function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
 
 export async function POST(request: Request) {
   try {
+    const [{ adminDb }, { cleanupExpiredHolds }] = await Promise.all([
+      import("@/lib/firebaseAdmin"),
+      import("@/lib/cleanupHolds")
+    ]);
+
     await cleanupExpiredHolds();
     const payload = (await request.json()) as InquiryPayload;
 
@@ -92,6 +94,9 @@ export async function POST(request: Request) {
     });
 
     try {
+      const { sendAdminNewInquiryEmail, sendInquiryReceivedEmail } =
+        await import("@/lib/mailer");
+
       await sendInquiryReceivedEmail({
         to: payload.email,
         name: payload.name,
