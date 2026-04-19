@@ -1,6 +1,11 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "greekhouse",
+  "main": ".open-next/worker.js",
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
   "compatibility_date": "2026-04-19",
   "observability": {
     "enabled": true
