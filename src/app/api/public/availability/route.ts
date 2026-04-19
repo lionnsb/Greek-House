@@ -4,6 +4,8 @@ import { dateKeysBetween } from "@/lib/date";
 import { buildSeasonsFromEnv, seasonForDate } from "@/lib/seasonPricing";
 import { cleanupExpiredHolds } from "@/lib/cleanupHolds";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   await cleanupExpiredHolds();
   const blocksSnap = await adminDb.collection("availability_blocks").get();

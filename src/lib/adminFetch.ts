@@ -1,6 +1,7 @@
-import { auth } from "@/lib/firebaseClient";
+import { getClientAuth } from "@/lib/firebaseClient";
 
 export async function adminFetch(input: RequestInfo, init?: RequestInit) {
+  const auth = getClientAuth();
   const token = await auth.currentUser?.getIdToken();
   if (!token) {
     throw new Error("Kein Admin-Token vorhanden.");

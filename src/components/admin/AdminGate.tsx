@@ -4,7 +4,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { auth } from "@/lib/firebaseClient";
+import { getClientAuth } from "@/lib/firebaseClient";
 
 export function AdminGate({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -22,6 +22,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const auth = getClientAuth();
     const unsub = onAuthStateChanged(auth, (user) => {
       if (!user) {
         setIsAuthed(false);
@@ -78,7 +79,7 @@ export function AdminGate({ children }: { children: React.ReactNode }) {
           <p className="text-ink/70">Eingeloggt als {email}</p>
           <button
             type="button"
-            onClick={() => signOut(auth)}
+            onClick={() => signOut(getClientAuth())}
             className="btn-outline"
           >
             Logout

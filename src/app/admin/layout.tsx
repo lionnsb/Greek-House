@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { AdminGate } from "@/components/admin/AdminGate";
 
+export const dynamic = "force-dynamic";
+
 const adminNav = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/anfragen", label: "Anfragen" },

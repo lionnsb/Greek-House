@@ -3,7 +3,7 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { auth } from "@/lib/firebaseClient";
+import { getClientAuth } from "@/lib/firebaseClient";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -17,7 +17,7 @@ export default function AdminLoginPage() {
     setStatus("loading");
     setError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(getClientAuth(), email, password);
       setStatus("idle");
       router.push("/admin");
     } catch (err) {
