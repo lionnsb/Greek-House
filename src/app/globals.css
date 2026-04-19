@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-sand text-ink;
+}
+
+.container {
+  @apply mx-auto w-full max-w-6xl px-6;
+}
+
+.section {
+  @apply py-16;
+}
+
+.card {
+  @apply rounded-2xl border border-stone bg-white shadow-sm;
+}
+
+.badge {
+  @apply inline-flex items-center rounded-full border border-stone px-3 py-1 text-sm;
+}
+
+.input {
+  @apply w-full rounded-xl border border-stone bg-white px-4 py-3 text-sm shadow-sm focus:border-ink focus:outline-none;
+}
+
+.input-currency {
+  @apply pl-12;
+}
+
+.currency-icon {
+  @apply absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink/60 w-6 text-center pointer-events-none;
+}
+
+.label {
+  @apply text-sm font-medium text-ink;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-black;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center rounded-xl border border-ink px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ink hover:text-white;
+}
+
+.btn:disabled,
+.btn-outline:disabled,
+.input:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.link {
+  @apply text-ink underline decoration-stone underline-offset-4 hover:decoration-ink;
+}
