@@ -11,7 +11,7 @@
     "deploy": "npm run cf:deploy",
     "preview": "npm run cf:preview",
     "cf:build": "npx @opennextjs/cloudflare@1.19.1 build --dangerouslyUseUnsupportedNextVersion",
-    "cf:deploy": "npx @opennextjs/cloudflare@1.19.1 deploy",
+    "cf:deploy": "npx wrangler@4.83.0 deploy .open-next/worker.js --assets .open-next/assets --config wrangler.jsonc",
     "cf:preview": "npm run cf:build && npx @opennextjs/cloudflare@1.19.1 preview"
   },
   "dependencies": {
