@@ -10,9 +10,9 @@
     "lint": "next lint",
     "deploy": "npm run cf:deploy",
     "preview": "npm run cf:preview",
-    "cf:build": "npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion",
-    "cf:deploy": "npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && npx opennextjs-cloudflare deploy",
-    "cf:preview": "npx opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && npx opennextjs-cloudflare preview"
+    "cf:build": "npx @opennextjs/cloudflare@1.19.1 build --dangerouslyUseUnsupportedNextVersion",
+    "cf:deploy": "npm run cf:build && npx @opennextjs/cloudflare@1.19.1 deploy",
+    "cf:preview": "npm run cf:build && npx @opennextjs/cloudflare@1.19.1 preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
