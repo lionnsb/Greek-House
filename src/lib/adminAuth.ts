@@ -11,10 +11,15 @@ export async function requireAdmin(request: Request) {
 
   const allowed = (process.env.ADMIN_EMAILS ?? "")
     .split(",")
-    .map((item) => item.trim())
+    .map((item) => item.trim().toLowerCase())
     .filter(Boolean);
+  const currentEmail = (decoded.email ?? "").trim().toLowerCase();
 
-  if (allowed.length > 0 && !allowed.includes(decoded.email ?? "")) {
+  if (!currentEmail) {
+    throw new Error("Token without email");
+  }
+
+  if (allowed.length > 0 && !allowed.includes(currentEmail)) {
     throw new Error("Not allowed");
   }
 
