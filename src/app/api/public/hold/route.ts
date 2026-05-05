@@ -16,10 +16,20 @@ export async function POST(request: Request) {
 
     await cleanupExpiredHolds();
     const payload = (await request.json()) as InquiryPayload;
+    const guests = Number(payload.guests);
+    const MAX_GUESTS = 7;
+    const STUDIO_REQUIRED_FROM_GUESTS = 6;
 
     if (!payload.acceptPrivacy) {
       return NextResponse.json({ message: "Datenschutz muss akzeptiert werden." }, { status: 400 });
     }
+    if (!Number.isInteger(guests) || guests < 1 || guests > MAX_GUESTS) {
+      return NextResponse.json(
+        { message: `Ungültige Gästeanzahl. Erlaubt sind 1-${MAX_GUESTS} Gäste.` },
+        { status: 400 }
+      );
+    }
+    const includesStudio = guests >= STUDIO_REQUIRED_FROM_GUESTS ? true : Boolean(payload.includesStudio);
 
     const blocksSnap = await adminDb.collection("availability_blocks").get();
     const seasonsSnap = await adminDb.collection("pricing_seasons").get();
@@ -61,7 +71,7 @@ export async function POST(request: Request) {
     const seasonal = calculateSeasonalTotal({
       startDate: payload.startDate,
       endDate: payload.endDate,
-      includesStudio: payload.includesStudio,
+      includesStudio,
       seasons: seasonList
     });
     const maxMinNights = seasonal.breakdown.reduce(
@@ -84,9 +94,9 @@ export async function POST(request: Request) {
       name: payload.name,
       email: payload.email,
       phone: payload.phone ?? null,
-      guests: payload.guests,
+      guests,
       message: payload.message ?? null,
-      includes_studio: payload.includesStudio,
+      includes_studio: includesStudio,
       min_nights_applied: maxMinNights,
       language: payload.language ?? "de",
       hold_until: holdUntil,
@@ -103,7 +113,7 @@ export async function POST(request: Request) {
         startDate: payload.startDate,
         endDate: payload.endDate,
         reservationId: docRef.id,
-        includesStudio: payload.includesStudio,
+        includesStudio,
         language: payload.language ?? "de"
       });
 
@@ -120,10 +130,10 @@ export async function POST(request: Request) {
             name: payload.name,
             email: payload.email,
             phone: payload.phone ?? null,
-            guests: payload.guests,
+            guests,
             startDate: payload.startDate,
             endDate: payload.endDate,
-            includesStudio: payload.includesStudio,
+            includesStudio,
             message: payload.message ?? null,
             reservationId: docRef.id,
             language: payload.language ?? "de"

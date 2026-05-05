@@ -21,17 +21,21 @@ const defaultValues: InquiryPayload = {
 };
 
 export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
+  const MAX_GUESTS = 7;
+  const STUDIO_REQUIRED_FROM_GUESTS = 6;
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [seasons, setSeasons] = useState<SeasonDefinition[]>([]);
-  const { register, handleSubmit, reset, watch } = useForm<InquiryPayload>({
+  const { register, handleSubmit, reset, setValue, watch } = useForm<InquiryPayload>({
     defaultValues
   });
   const router = useRouter();
 
   const startDate = watch("startDate");
   const endDate = watch("endDate");
+  const guests = watch("guests");
   const includesStudio = watch("includesStudio");
+  const studioRequired = Number(guests) >= STUDIO_REQUIRED_FROM_GUESTS;
 
   useEffect(() => {
     async function loadSeasons() {
@@ -45,6 +49,12 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
     }
     loadSeasons();
   }, []);
+
+  useEffect(() => {
+    if (studioRequired && !includesStudio) {
+      setValue("includesStudio", true, { shouldDirty: true });
+    }
+  }, [studioRequired, includesStudio, setValue]);
 
   async function onSubmit(payload: InquiryPayload) {
     setStatus("loading");
@@ -89,10 +99,26 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="label">{locale === "en" ? "Guests" : "Gästeanzahl"}</label>
-          <input type="number" min={1} className="input" {...register("guests", { required: true })} />
+          <input
+            type="number"
+            min={1}
+            max={MAX_GUESTS}
+            className="input"
+            {...register("guests", { required: true, min: 1, max: MAX_GUESTS, valueAsNumber: true })}
+          />
+          <p className="mt-1 text-xs text-ink/60">
+            {locale === "en"
+              ? "Up to 7 guests. Studio is mandatory for 6-7 guests."
+              : "Maximal 7 Gäste. Bei 6-7 Gästen ist das Studio verpflichtend."}
+          </p>
         </div>
         <div className="flex items-center gap-2 pt-6">
-          <input type="checkbox" className="h-4 w-4" {...register("includesStudio")} />
+          <input
+            type="checkbox"
+            className="h-4 w-4"
+            disabled={studioRequired}
+            {...register("includesStudio")}
+          />
           <span className="text-sm text-ink/70">
             {locale === "en"
               ? "Add studio (only together with the house)"

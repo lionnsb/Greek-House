@@ -25,6 +25,8 @@ type FormValues = {
 };
 
 export default function AdminAnfragenPage() {
+  const MAX_GUESTS = 7;
+  const STUDIO_REQUIRED_FROM_GUESTS = 6;
   const [items, setItems] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [actions, setActions] = useState<Record<string, ActionState>>({});
@@ -69,6 +71,7 @@ export default function AdminAnfragenPage() {
         setItems(data.items ?? []);
         const nextFormValues: typeof formValues = {};
         (data.items ?? []).forEach((item: Reservation) => {
+          const studioRequired = Number(item.guests) >= STUDIO_REQUIRED_FROM_GUESTS;
           nextFormValues[item.id] = {
             priceTotal: item.priceTotal?.toString() ?? "",
             depositAmount: item.depositAmount?.toString() ?? "",
@@ -76,7 +79,7 @@ export default function AdminAnfragenPage() {
             startDate: item.startDate,
             endDate: item.endDate,
             guests: item.guests?.toString() ?? "",
-            includesStudio: item.includesStudio,
+            includesStudio: studioRequired ? true : item.includesStudio,
             message: item.message ?? ""
           };
         });
@@ -140,11 +143,25 @@ export default function AdminAnfragenPage() {
   }
 
   function updateFormValue(id: string, field: keyof FormValues, value: string | boolean) {
+    const current = formValues[id];
+    if (!current) return;
+
+    const nextGuests =
+      field === "guests" ? Number(value) : Number(current.guests);
+    const studioRequired = Number.isFinite(nextGuests) && nextGuests >= STUDIO_REQUIRED_FROM_GUESTS;
+    const nextIncludesStudio =
+      studioRequired
+        ? true
+        : field === "includesStudio"
+          ? Boolean(value)
+          : current.includesStudio;
+
     setFormValues((prev) => ({
       ...prev,
       [id]: {
-        ...prev[id],
-        [field]: value
+        ...current,
+        [field]: value,
+        includesStudio: nextIncludesStudio
       }
     }));
     setFieldErrors((prev) => ({ ...prev, [id]: null }));
@@ -588,6 +605,8 @@ export default function AdminAnfragenPage() {
                     <input
                       type="number"
                       className="input"
+                      min={1}
+                      max={MAX_GUESTS}
                       value={form.guests}
                       onChange={(event) =>
                         updateFormValue(item.id, "guests", event.target.value)
@@ -599,6 +618,7 @@ export default function AdminAnfragenPage() {
                       type="checkbox"
                       className="h-4 w-4"
                       checked={form.includesStudio}
+                      disabled={Number(form.guests) >= STUDIO_REQUIRED_FROM_GUESTS}
                       onChange={(event) =>
                         updateFormValue(item.id, "includesStudio", event.target.checked)
                       }
@@ -621,13 +641,20 @@ export default function AdminAnfragenPage() {
                       type="button"
                       className="btn"
                       onClick={() =>
-                        updateReservation(item.id, {
-                          startDate: form.startDate,
-                          endDate: form.endDate,
-                          guests: Number(form.guests),
-                          includesStudio: form.includesStudio,
-                          message: form.message
-                        })
+                        {
+                          const guestCount = Number(form.guests);
+                          const normalizedIncludesStudio =
+                            guestCount >= STUDIO_REQUIRED_FROM_GUESTS
+                              ? true
+                              : form.includesStudio;
+                          updateReservation(item.id, {
+                            startDate: form.startDate,
+                            endDate: form.endDate,
+                            guests: Number(form.guests),
+                            includesStudio: normalizedIncludesStudio,
+                            message: form.message
+                          });
+                        }
                       }
                     >
                       Änderungen speichern

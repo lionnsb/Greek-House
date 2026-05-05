@@ -22,6 +22,8 @@ export async function PATCH(request: Request, context: { params: { id: string } 
   const nextStatus = payload.status as string | undefined;
   const data = doc.data();
   const currentStatus = data?.status as string | undefined;
+  const MAX_GUESTS = 7;
+  const STUDIO_REQUIRED_FROM_GUESTS = 6;
 
   if (currentStatus === "CONFIRMED" && nextStatus) {
     return NextResponse.json(
@@ -87,6 +89,19 @@ export async function PATCH(request: Request, context: { params: { id: string } 
     }
   }
 
+  const nextGuestsRaw = payload.guests ?? data?.guests;
+  const nextGuests = Number(nextGuestsRaw);
+  if (!Number.isInteger(nextGuests) || nextGuests < 1 || nextGuests > MAX_GUESTS) {
+    return NextResponse.json(
+      { message: `Ungültige Gästeanzahl. Erlaubt sind 1-${MAX_GUESTS} Gäste.` },
+      { status: 400 }
+    );
+  }
+  const nextIncludesStudio =
+    nextGuests >= STUDIO_REQUIRED_FROM_GUESTS
+      ? true
+      : (payload.includesStudio ?? data?.includes_studio ?? false);
+
   await docRef.update({
     status: nextStatus ?? data?.status,
     price_total: payload.priceTotal ?? data?.price_total ?? null,
@@ -95,8 +110,8 @@ export async function PATCH(request: Request, context: { params: { id: string } 
     hold_until: payload.holdUntil ?? data?.hold_until ?? null,
     start_date: payload.startDate ?? data?.start_date,
     end_date: payload.endDate ?? data?.end_date,
-    guests: payload.guests ?? data?.guests,
-    includes_studio: payload.includesStudio ?? data?.includes_studio,
+    guests: nextGuests,
+    includes_studio: nextIncludesStudio,
     message: payload.message ?? data?.message ?? null
   });
 
