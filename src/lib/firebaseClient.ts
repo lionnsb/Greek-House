@@ -2,37 +2,39 @@ import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
+const DEFAULT_PUBLIC_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCnjlFpZu5s5j7uxfSsrEpAVNfSIOaFhDs",
+  authDomain: "greek-house-cdf06.firebaseapp.com",
+  projectId: "greek-house-cdf06",
+  storageBucket: "greek-house-cdf06.firebasestorage.app",
+  messagingSenderId: "768056597788",
+  appId: "1:768056597788:web:c2308f306c7ce8fab02ed9"
+} as const;
+
 let firebaseApp: FirebaseApp | null = null;
 let authInstance: Auth | null = null;
 let dbInstance: Firestore | null = null;
 
 function getFirebaseConfig() {
-  const config = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
-  };
-
-  const missing = Object.entries(config)
-    .filter(([, value]) => !value)
-    .map(([key]) => key);
-
-  if (missing.length > 0) {
-    throw new Error(
-      `Firebase Public Config fehlt: ${missing.join(", ")}`
-    );
-  }
-
-  return config as {
-    apiKey: string;
-    authDomain: string;
-    projectId: string;
-    storageBucket: string;
-    messagingSenderId: string;
-    appId: string;
+  return {
+    apiKey:
+      process.env.NEXT_PUBLIC_FIREBASE_API_KEY ??
+      DEFAULT_PUBLIC_FIREBASE_CONFIG.apiKey,
+    authDomain:
+      process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ??
+      DEFAULT_PUBLIC_FIREBASE_CONFIG.authDomain,
+    projectId:
+      process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ??
+      DEFAULT_PUBLIC_FIREBASE_CONFIG.projectId,
+    storageBucket:
+      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ??
+      DEFAULT_PUBLIC_FIREBASE_CONFIG.storageBucket,
+    messagingSenderId:
+      process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ??
+      DEFAULT_PUBLIC_FIREBASE_CONFIG.messagingSenderId,
+    appId:
+      process.env.NEXT_PUBLIC_FIREBASE_APP_ID ??
+      DEFAULT_PUBLIC_FIREBASE_CONFIG.appId
   };
 }
 
