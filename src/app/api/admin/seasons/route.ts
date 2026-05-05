@@ -9,8 +9,9 @@ function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
 export async function GET(request: Request) {
   try {
     await requireAdmin(request);
-  } catch {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
+    return NextResponse.json({ message }, { status: 401 });
   }
 
   const snap = await adminDb.collection("pricing_seasons").get();
@@ -34,8 +35,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await requireAdmin(request);
-  } catch {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
+    return NextResponse.json({ message }, { status: 401 });
   }
 
   const payload = await request.json();

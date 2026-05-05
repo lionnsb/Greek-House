@@ -13,8 +13,9 @@ type AcceptPayload = {
 export async function POST(request: Request) {
   try {
     await requireAdmin(request);
-  } catch {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized";
+    return NextResponse.json({ message }, { status: 401 });
   }
 
   const payload = (await request.json()) as AcceptPayload;
