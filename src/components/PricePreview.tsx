@@ -61,15 +61,39 @@ export function PricePreview({
   return (
     <div className="text-sm text-ink/70">
       <p>
-        {locale === "en"
-          ? `Preview: ${pricing.nights} nights · Total approx. ${pricing.total.toFixed(0)}€`
-          : `Vorschau: ${pricing.nights} Nächte · Gesamtpreis ca. ${pricing.total.toFixed(0)}€`}
+        {locale === "en" ? "Price breakdown" : "Preisaufschlüsselung"}
       </p>
-      <p className="mt-1 text-xs text-ink/50">
-        {locale === "en"
-          ? "Note: Final price will be confirmed upon acceptance."
-          : "Hinweis: Endpreis wird bei Annahme bestätigt."}
-      </p>
+      <div className="mt-2 space-y-1 text-xs">
+        <p>
+          {locale === "en"
+            ? `Apartment: ${pricing.apartmentNightlyTotal.toFixed(0)}€ (${pricing.nights} nights)`
+            : `Apartment: ${pricing.apartmentNightlyTotal.toFixed(0)}€ (${pricing.nights} Nächte)`}
+        </p>
+        {includesStudio && (
+          <p>
+            {locale === "en"
+              ? `Studio: ${pricing.studioNightlyTotal.toFixed(0)}€ (${pricing.nights} nights)`
+              : `Studio: ${pricing.studioNightlyTotal.toFixed(0)}€ (${pricing.nights} Nächte)`}
+          </p>
+        )}
+        <p>
+          {locale === "en"
+            ? `Cleaning fee apartment: ${pricing.cleaningApartment.toFixed(0)}€`
+            : `Reinigungsgebühr Apartment: ${pricing.cleaningApartment.toFixed(0)}€`}
+        </p>
+        {includesStudio && (
+          <p>
+            {locale === "en"
+              ? `Cleaning fee studio: ${pricing.cleaningStudio.toFixed(0)}€`
+              : `Reinigungsgebühr Studio: ${pricing.cleaningStudio.toFixed(0)}€`}
+          </p>
+        )}
+        <p className="font-semibold text-ink">
+          {locale === "en"
+            ? `Total: ${pricing.total.toFixed(0)}€`
+            : `Gesamtpreis: ${pricing.total.toFixed(0)}€`}
+        </p>
+      </div>
     </div>
   );
 }

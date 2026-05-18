@@ -1,14 +1,47 @@
-import { isWithinInterval, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
+import {
+  APARTMENT_CLEANING_FEE,
+  STUDIO_CLEANING_FEE
+} from "@/lib/bookingRules";
 import { nightsBetween } from "@/lib/pricing";
 
 export type SeasonDefinition = {
   name: string;
-  start: string; // yyyy-MM-dd
-  end: string; // yyyy-MM-dd (exclusive)
+  start: string; // yyyy-MM-dd (inclusive)
+  end: string; // yyyy-MM-dd (inclusive)
   pricePerNight: number;
   studioSurchargePerNight: number;
   minNights: number;
 };
+
+function normalizeSeasonName(name: string) {
+  return name.trim().toLowerCase();
+}
+
+function seasonPriority(name: string) {
+  const normalized = normalizeSeasonName(name);
+  if (normalized === "standard") return -100;
+  if (normalized === "hauptsaison" || normalized === "highseason" || normalized === "sommer") {
+    return 50;
+  }
+  if (normalized === "vorsaison" || normalized === "preseason") return 40;
+  if (normalized === "nachsaison" || normalized === "postseason") return 30;
+  if (normalized === "winter") return 20;
+  return 10;
+}
+
+function sortSeasonCandidates(seasons: SeasonDefinition[]) {
+  return [...seasons].sort((a, b) => {
+    const priorityDelta = seasonPriority(b.name) - seasonPriority(a.name);
+    if (priorityDelta !== 0) return priorityDelta;
+    if (a.start === b.start) return 0;
+    return a.start < b.start ? 1 : -1;
+  });
+}
+
+function isDateInsideSeason(date: string, season: SeasonDefinition) {
+  return date >= season.start && date <= season.end;
+}
 
 export function buildSeasonsFromEnv(): SeasonDefinition[] {
   const summerStart = process.env.NEXT_PUBLIC_SUMMER_START ?? "";
@@ -32,7 +65,7 @@ export function buildSeasonsFromEnv(): SeasonDefinition[] {
   const seasons: SeasonDefinition[] = [];
   if (summerStart && summerEnd) {
     seasons.push({
-      name: "summer",
+      name: "Hauptsaison",
       start: summerStart,
       end: summerEnd,
       pricePerNight: summerPrice || standardPrice,
@@ -42,7 +75,7 @@ export function buildSeasonsFromEnv(): SeasonDefinition[] {
   }
   if (winterStart && winterEnd) {
     seasons.push({
-      name: "winter",
+      name: "Winter",
       start: winterStart,
       end: winterEnd,
       pricePerNight: winterPrice || standardPrice,
@@ -51,7 +84,7 @@ export function buildSeasonsFromEnv(): SeasonDefinition[] {
     });
   }
   seasons.push({
-    name: "standard",
+    name: "Standard",
     start: "1900-01-01",
     end: "3000-01-01",
     pricePerNight: standardPrice,
@@ -63,21 +96,11 @@ export function buildSeasonsFromEnv(): SeasonDefinition[] {
 }
 
 export function seasonForDate(date: string, seasons: SeasonDefinition[]) {
-  const target = parseISO(date);
-  for (const season of seasons) {
-    const start = parseISO(season.start);
-    const endExclusive = parseISO(season.end);
-    const endInclusive = new Date(endExclusive.getTime() - 24 * 60 * 60 * 1000);
-    if (
-      isWithinInterval(target, {
-        start,
-        end: endInclusive
-      })
-    ) {
-      return season;
-    }
-  }
-  return seasons.find((item) => item.name === "standard") ?? seasons[0];
+  const matched = sortSeasonCandidates(seasons).find((season) =>
+    isDateInsideSeason(date, season)
+  );
+  if (matched) return matched;
+  return seasons.find((item) => normalizeSeasonName(item.name) === "standard") ?? null;
 }
 
 export function calculateSeasonalTotal({
@@ -94,25 +117,66 @@ export function calculateSeasonalTotal({
   const emptyBreakdown: Array<{
     date: string;
     season: string;
-    price: number;
+    apartmentPrice: number;
+    studioPrice: number;
+    totalPrice: number;
     minNights: number;
   }> = [];
 
   const nights = nightsBetween(startDate, endDate);
   if (nights === 0) {
-    return { nights, total: 0, breakdown: emptyBreakdown };
+    return {
+      nights,
+      apartmentNightlyTotal: 0,
+      studioNightlyTotal: 0,
+      cleaningApartment: 0,
+      cleaningStudio: 0,
+      total: 0,
+      breakdown: emptyBreakdown
+    };
   }
 
-  const breakdown: Array<{ date: string; season: string; price: number; minNights: number }> = [];
+  const breakdown: Array<{
+    date: string;
+    season: string;
+    apartmentPrice: number;
+    studioPrice: number;
+    totalPrice: number;
+    minNights: number;
+  }> = [];
+
   let cursor = parseISO(startDate);
   for (let i = 0; i < nights; i += 1) {
     const date = cursor.toISOString().slice(0, 10);
     const season = seasonForDate(date, seasons);
-    const nightly = season.pricePerNight + (includesStudio ? season.studioSurchargePerNight : 0);
-    breakdown.push({ date, season: season.name, price: nightly, minNights: season.minNights });
+    const apartmentPrice = season?.pricePerNight ?? 0;
+    const studioPrice = includesStudio ? season?.studioSurchargePerNight ?? 0 : 0;
+    const totalPrice = apartmentPrice + studioPrice;
+    breakdown.push({
+      date,
+      season: season?.name ?? "Standard",
+      apartmentPrice,
+      studioPrice,
+      totalPrice,
+      minNights: season?.minNights ?? 1
+    });
     cursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000);
   }
 
-  const total = breakdown.reduce((sum, item) => sum + item.price, 0);
-  return { nights, total, breakdown };
+  const apartmentNightlyTotal = breakdown.reduce((sum, item) => sum + item.apartmentPrice, 0);
+  const studioNightlyTotal = breakdown.reduce((sum, item) => sum + item.studioPrice, 0);
+  const cleaningApartment = APARTMENT_CLEANING_FEE;
+  const cleaningStudio = includesStudio ? STUDIO_CLEANING_FEE : 0;
+  const total =
+    apartmentNightlyTotal + studioNightlyTotal + cleaningApartment + cleaningStudio;
+
+  return {
+    nights,
+    apartmentNightlyTotal,
+    studioNightlyTotal,
+    cleaningApartment,
+    cleaningStudio,
+    total,
+    breakdown
+  };
 }

@@ -6,6 +6,12 @@ import { useForm } from "react-hook-form";
 import type { InquiryPayload } from "@/lib/types";
 import type { SeasonDefinition } from "@/lib/seasonPricing";
 import { PricePreview } from "@/components/PricePreview";
+import {
+  hasShortNotice,
+  isStudioRequired,
+  isStudioSelectable,
+  MAX_GUESTS
+} from "@/lib/bookingRules";
 
 const defaultValues: InquiryPayload = {
   startDate: "",
@@ -17,12 +23,11 @@ const defaultValues: InquiryPayload = {
   phone: "",
   message: "",
   acceptPrivacy: false,
+  acceptHouseRules: false,
   language: "de"
 };
 
 export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
-  const MAX_GUESTS = 7;
-  const STUDIO_REQUIRED_FROM_GUESTS = 6;
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [seasons, setSeasons] = useState<SeasonDefinition[]>([]);
@@ -35,7 +40,10 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
   const endDate = watch("endDate");
   const guests = watch("guests");
   const includesStudio = watch("includesStudio");
-  const studioRequired = Number(guests) >= STUDIO_REQUIRED_FROM_GUESTS;
+  const guestCount = Number(guests);
+  const studioRequired = isStudioRequired(guestCount);
+  const studioSelectable = isStudioSelectable(guestCount);
+  const shortNotice = startDate ? hasShortNotice(startDate) : false;
 
   useEffect(() => {
     async function loadSeasons() {
@@ -51,10 +59,14 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
   }, []);
 
   useEffect(() => {
+    if (!studioSelectable && includesStudio) {
+      setValue("includesStudio", false, { shouldDirty: true });
+      return;
+    }
     if (studioRequired && !includesStudio) {
       setValue("includesStudio", true, { shouldDirty: true });
     }
-  }, [studioRequired, includesStudio, setValue]);
+  }, [studioRequired, studioSelectable, includesStudio, setValue]);
 
   async function onSubmit(payload: InquiryPayload) {
     setStatus("loading");
@@ -96,6 +108,13 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
           ? "Minimum stay depends on season. A note will appear automatically."
           : "Mindestaufenthalt abhängig von Saison. Hinweis erscheint automatisch."}
       </div>
+      {shortNotice && (
+        <p className="text-sm text-amber-700">
+          {locale === "en"
+            ? "Attention: We cannot guarantee availability for this short-notice request."
+            : "Achtung: Wir können die Verfügbarkeit für Ihren gewünschten Termin aufgrund der kurzfristigen Anfrage nicht garantieren."}
+        </p>
+      )}
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="label">{locale === "en" ? "Guests" : "Gästeanzahl"}</label>
@@ -108,21 +127,21 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
           />
           <p className="mt-1 text-xs text-ink/60">
             {locale === "en"
-              ? "Up to 7 guests. Studio is mandatory for 6-7 guests."
-              : "Maximal 7 Gäste. Bei 6-7 Gästen ist das Studio verpflichtend."}
+              ? "Up to 7 guests. Studio can be selected from 3 guests and is mandatory for 6-7 guests."
+              : "Maximal 7 Gäste. Studio ist ab 3 Gästen wählbar und bei 6-7 Gästen verpflichtend."}
           </p>
         </div>
         <div className="flex items-center gap-2 pt-6">
           <input
             type="checkbox"
             className="h-4 w-4"
-            disabled={studioRequired}
+            disabled={studioRequired || !studioSelectable}
             {...register("includesStudio")}
           />
           <span className="text-sm text-ink/70">
             {locale === "en"
-              ? "Add studio (only together with the house)"
-              : "Studio zusätzlich buchen (nur zusammen mit dem Haus)"}
+              ? "Add studio (only together with the apartment)"
+              : "Studio zusätzlich buchen (nur zusammen mit dem Apartment)"}
           </span>
         </div>
       </div>
@@ -162,7 +181,11 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
       </div>
       <label className="flex items-center gap-2 text-sm text-ink/70">
         <input type="checkbox" className="h-4 w-4" {...register("acceptPrivacy", { required: true })} />
-        {locale === "en" ? "I have read the privacy policy." : "Ich habe die Datenschutzerklärung gelesen."}
+        {locale === "en" ? "I accept the booking terms (AGB)." : "Ich akzeptiere die Buchungsbedingungen (AGB)."}
+      </label>
+      <label className="flex items-center gap-2 text-sm text-ink/70">
+        <input type="checkbox" className="h-4 w-4" {...register("acceptHouseRules", { required: true })} />
+        {locale === "en" ? "I accept the house rules." : "Ich akzeptiere die Hausregeln."}
       </label>
       <button type="submit" className="btn" disabled={status === "loading"}>
         {locale === "en" ? "Send request" : "Anfrage senden"}

@@ -1,9 +1,9 @@
 "use client";
 
 import { addDays, endOfMonth, format, startOfMonth, startOfWeek } from "date-fns";
-import { de } from "date-fns/locale";
+import { de, enUS } from "date-fns/locale";
 import { useMemo, useState } from "react";
-import type { DayStatusMap } from "@/lib/types";
+import type { DayStatus, DayStatusMap } from "@/lib/types";
 import type { SeasonDefinition } from "@/lib/seasonPricing";
 import { seasonForDate } from "@/lib/seasonPricing";
 
@@ -31,17 +31,20 @@ const statusLabelsEn: Record<string, string> = {
 export function AvailabilityCalendar({
   initialMonth = new Date(),
   dayStatus,
-  filter = "ALL",
   seasons = [],
-  locale = "de"
+  locale = "de",
+  includesStudio = false,
+  legendStatuses = ["FREE", "BLOCKED", "HOLD", "CONFIRMED"]
 }: {
   initialMonth?: Date;
   dayStatus: DayStatusMap;
-  filter?: "ALL" | "FREE" | "BLOCKED" | "HOLD" | "CONFIRMED";
   seasons?: SeasonDefinition[];
   locale?: "de" | "en";
+  includesStudio?: boolean;
+  legendStatuses?: DayStatus[];
 }) {
   const [month, setMonth] = useState(startOfMonth(initialMonth));
+  const calendarLocale = locale === "en" ? enUS : de;
 
   const days = useMemo(() => {
     const start = startOfWeek(startOfMonth(month), { weekStartsOn: 1 });
@@ -63,21 +66,23 @@ export function AvailabilityCalendar({
           className="btn-outline"
           onClick={() => setMonth(addDays(month, -30))}
         >
-          Zurück
+          {locale === "en" ? "Back" : "Zurück"}
         </button>
         <p className="text-sm font-semibold">
-          {format(month, "MMMM yyyy", { locale: de })}
+          {format(month, "MMMM yyyy", { locale: calendarLocale })}
         </p>
         <button
           type="button"
           className="btn-outline"
           onClick={() => setMonth(addDays(month, 30))}
         >
-          Weiter
+          {locale === "en" ? "Next" : "Weiter"}
         </button>
       </div>
       <div className="mt-6 grid grid-cols-7 gap-2 text-xs">
-        {["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((day) => (
+        {(locale === "en"
+          ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+          : ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]).map((day) => (
           <div key={day} className="text-center text-ink/60">
             {day}
           </div>
@@ -87,22 +92,14 @@ export function AvailabilityCalendar({
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const status = dayStatus[key] ?? "FREE";
-          if (filter !== "ALL" && status !== filter) {
-            return (
-              <div
-                key={key}
-                className="rounded-lg border border-transparent px-2 py-3 text-center text-xs text-transparent"
-              >
-                <div className="font-semibold">{format(day, "d")}</div>
-                <div className="mt-1 text-[10px]">.</div>
-              </div>
-            );
-          }
           const style = statusStyles[status] ?? statusStyles.FREE;
           const season = seasons.length ? seasonForDate(key, seasons) : null;
+          const nightly =
+            (season?.pricePerNight ?? 0) +
+            (includesStudio ? season?.studioSurchargePerNight ?? 0 : 0);
           const price =
-            season && season.pricePerNight
-              ? `${season.pricePerNight}€`
+            season && nightly
+              ? `${nightly}€`
               : "";
           const minStay =
             season && season.minNights ? ` · Min. ${season.minNights}N` : "";
@@ -124,10 +121,11 @@ export function AvailabilityCalendar({
         })}
       </div>
       <div className="mt-4 flex flex-wrap gap-3 text-xs text-ink/70">
-        <span className="badge">FREE</span>
-        <span className="badge">BLOCKED</span>
-        <span className="badge">HOLD</span>
-        <span className="badge">CONFIRMED</span>
+        {legendStatuses.map((status) => (
+          <span key={status} className={`badge border ${statusStyles[status]}`}>
+            {status}
+          </span>
+        ))}
       </div>
     </div>
   );

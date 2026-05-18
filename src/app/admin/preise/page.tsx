@@ -98,7 +98,9 @@ export default function AdminPreisePage() {
           <div>
             <label className="label">Saison</label>
             <select name="name" className="input" required>
-              <option value="Sommer">Sommer</option>
+              <option value="Hauptsaison">Hauptsaison</option>
+              <option value="Vorsaison">Vorsaison</option>
+              <option value="Nachsaison">Nachsaison</option>
               <option value="Winter">Winter</option>
               <option value="Standard">Standard</option>
             </select>
@@ -111,6 +113,7 @@ export default function AdminPreisePage() {
             <div>
               <label className="label">Enddatum</label>
               <input name="endDate" type="date" className="input" required />
+              <p className="mt-1 text-xs text-ink/60">Enddatum wird inklusive gerechnet.</p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">

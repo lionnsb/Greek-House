@@ -9,8 +9,9 @@ const copy = {
     cta: "Verfügbarkeit prüfen",
     nav: [
       { href: "/", label: "Start" },
-      { href: "/haus", label: "Haus" },
-      { href: "/studio", label: "Studio" },
+      { href: "/haus", label: "Apartment" },
+      { href: "/haus#studio", label: "Studio" },
+      { href: "/haus#hausregeln", label: "Hausregeln" },
       { href: "/verfuegbarkeit", label: "Verfügbarkeit" },
       { href: "/anreise", label: "Anreise" },
       { href: "/kontakt", label: "Kontakt" }
@@ -21,8 +22,9 @@ const copy = {
     cta: "Check availability",
     nav: [
       { href: "/en", label: "Home" },
-      { href: "/en/haus", label: "House" },
-      { href: "/en/studio", label: "Studio" },
+      { href: "/en/haus", label: "Apartment" },
+      { href: "/en/haus#studio", label: "Studio" },
+      { href: "/en/haus#hausregeln", label: "House rules" },
       { href: "/en/verfuegbarkeit", label: "Availability" },
       { href: "/en/anreise", label: "Arrival" },
       { href: "/en/kontakt", label: "Contact" }

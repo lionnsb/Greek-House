@@ -8,7 +8,7 @@ const houseHighlights = [
   "Large terrace with 30 m² pool",
   "Outdoor kitchen with gas grill (plancha)",
   "Two bedrooms & two bathrooms",
-  "Additional studio with private bathroom"
+  "Integrated studio with private bathroom (optional)"
 ];
 
 const studioHighlights = [
@@ -16,11 +16,11 @@ const studioHighlights = [
   "Access via the terrace",
   "Double bed 140 x 200",
   "Air conditioning & standing fan",
-  "Only bookable together with the house"
+  "Only bookable together with the apartment area"
 ];
 
 const rooms = [
-  { title: "Cooking, Dining, Living", description: "Fully equipped kitchen with induction hob, oven, dishwasher and washing machine. Indoor and outdoor kitchen with gas grill." },
+  { title: "Cooking, Dining, Living", description: "Fully equipped kitchen with oven, dishwasher and washing machine. Indoor and outdoor kitchen with gas grill." },
   { title: "Master Bedroom", description: "Double bed 160 x 200, open wardrobe, safe. Shower bathroom via hallway." },
   { title: "Second Bedroom", description: "Double bed 160 x 200 + bunk bed 90 x 200, ensuite bathroom and private sea-view terrace." },
   { title: "Bathrooms", description: "All bathrooms with rain shower, hand shower, washbasin and bidet spray." },
@@ -44,11 +44,11 @@ export default function HousePageEn() {
         <div className="container grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="badge">Mati tis Thalassas</p>
-            <h1 className="mt-4 text-3xl font-semibold">The House</h1>
+            <h1 className="mt-4 text-3xl font-semibold">The Apartment</h1>
             <p className="mt-4 text-base text-ink/70">
-              Our holiday home in Kastraki on Naxos offers space for families and
-              groups. Spacious living areas, quiet bedrooms, a high-quality
-              kitchen and inviting outdoor areas.
+              Our apartment area in Kastraki, Naxos offers space for families
+              and groups. The apartment is part of a house with another area
+              that is privately used.
             </p>
             <ul className="mt-6 grid gap-3 text-sm text-ink/70">
               {houseHighlights.map((item) => (
@@ -103,10 +103,10 @@ export default function HousePageEn() {
       <section className="section">
         <div className="container grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
-            <h2 className="text-2xl font-semibold">Studio (optional)</h2>
+            <h2 id="studio" className="text-2xl font-semibold scroll-mt-24">Studio (optional, integrated)</h2>
             <p className="mt-4 text-sm text-ink/70">
-              The studio is a separate area and can only be booked together with
-              the house. Ideal for additional privacy.
+              The studio is integrated into the apartment area and can only be
+              booked together with the apartment. Ideal for additional privacy.
             </p>
             <ul className="mt-4 grid gap-3 text-sm text-ink/70">
               {studioHighlights.map((item) => (
@@ -128,7 +128,7 @@ export default function HousePageEn() {
           <div>
             <h2 className="text-2xl font-semibold">Location & Surroundings</h2>
             <p className="mt-4 text-sm text-ink/70">
-              The villa is located in Kastraki – only about 50 m from the sea
+              The apartment area is located in Kastraki – only about 50 m from the sea
               and a small beach. To the right you reach Sahara Beach after about
               250 m, to the left Glyfada Beach after about 350 m.
             </p>
@@ -144,6 +144,17 @@ export default function HousePageEn() {
             <PlaceholderImage label="Glyfada Beach" />
             <PlaceholderImage label="Naxos" />
           </div>
+        </div>
+      </section>
+      <section className="section bg-white">
+        <div className="container">
+          <h2 id="hausregeln" className="text-2xl font-semibold scroll-mt-24">House rules</h2>
+          <ul className="mt-4 grid gap-3 text-sm text-ink/70">
+            <li>Check-in from 16:00, check-out by 10:00</li>
+            <li>Non-smoking apartment</li>
+            <li>NO PETS</li>
+            <li>Please respect the privately used apartment area in the same house</li>
+          </ul>
         </div>
       </section>
     </div>

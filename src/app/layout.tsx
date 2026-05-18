@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Mati tis Thalassas",
   description:
-    "Ferienhaus in Kastraki, Naxos – Verfügbarkeit prüfen und anfragen."
+    "Apartment in Kastraki, Naxos – Verfügbarkeit prüfen und anfragen."
 };
 
 export default function RootLayout({

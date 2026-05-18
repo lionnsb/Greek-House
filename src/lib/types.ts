@@ -18,6 +18,7 @@ export type InquiryPayload = {
   phone?: string;
   message?: string;
   acceptPrivacy: boolean;
+  acceptHouseRules: boolean;
   language?: "de" | "en";
 };
 

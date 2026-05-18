@@ -1,5 +1,12 @@
-import { addHours } from "date-fns";
+import { addDays, addHours, format, parseISO } from "date-fns";
 import { NextResponse } from "next/server";
+import {
+  hasShortNotice,
+  isGuestCountValid,
+  MAX_GUESTS,
+  normalizeStudioSelection,
+  reservationBlocksUntil
+} from "@/lib/bookingRules";
 import type { InquiryPayload } from "@/lib/types";
 import { buildSeasonsFromEnv, calculateSeasonalTotal } from "@/lib/seasonPricing";
 
@@ -17,19 +24,24 @@ export async function POST(request: Request) {
     await cleanupExpiredHolds();
     const payload = (await request.json()) as InquiryPayload;
     const guests = Number(payload.guests);
-    const MAX_GUESTS = 7;
-    const STUDIO_REQUIRED_FROM_GUESTS = 6;
 
     if (!payload.acceptPrivacy) {
-      return NextResponse.json({ message: "Datenschutz muss akzeptiert werden." }, { status: 400 });
+      return NextResponse.json({ message: "AGB müssen akzeptiert werden." }, { status: 400 });
     }
-    if (!Number.isInteger(guests) || guests < 1 || guests > MAX_GUESTS) {
+    if (!payload.acceptHouseRules) {
+      return NextResponse.json(
+        { message: "Hausregeln müssen akzeptiert werden." },
+        { status: 400 }
+      );
+    }
+    if (!isGuestCountValid(guests)) {
       return NextResponse.json(
         { message: `Ungültige Gästeanzahl. Erlaubt sind 1-${MAX_GUESTS} Gäste.` },
         { status: 400 }
       );
     }
-    const includesStudio = guests >= STUDIO_REQUIRED_FROM_GUESTS ? true : Boolean(payload.includesStudio);
+    const includesStudio = normalizeStudioSelection(guests, Boolean(payload.includesStudio));
+    const shortNotice = hasShortNotice(payload.startDate);
 
     const blocksSnap = await adminDb.collection("availability_blocks").get();
     const seasonsSnap = await adminDb.collection("pricing_seasons").get();
@@ -50,9 +62,14 @@ export async function POST(request: Request) {
       .where("status", "in", ["HOLD", "ACCEPTED_AWAITING_PAYMENT", "CONFIRMED"])
       .get();
 
+    const todayKey = format(new Date(), "yyyy-MM-dd");
     const hasConflict = blocksSnap.docs.some((doc) => {
       const data = doc.data();
-      return overlaps(payload.startDate, payload.endDate, data.start_date, data.end_date);
+      if (data.end_date && data.end_date < todayKey) {
+        return false;
+      }
+      const blockEndExclusive = format(addDays(parseISO(data.end_date), 1), "yyyy-MM-dd");
+      return overlaps(payload.startDate, payload.endDate, data.start_date, blockEndExclusive);
     });
 
     const now = new Date().toISOString();
@@ -61,7 +78,8 @@ export async function POST(request: Request) {
       if (data.status === "HOLD" && data.hold_until && data.hold_until < now) {
         return false;
       }
-      return overlaps(payload.startDate, payload.endDate, data.start_date, data.end_date);
+      const blockedUntil = reservationBlocksUntil(data.end_date);
+      return overlaps(payload.startDate, payload.endDate, data.start_date, blockedUntil);
     });
 
     if (hasConflict || hasReservationConflict) {
@@ -97,6 +115,7 @@ export async function POST(request: Request) {
       guests,
       message: payload.message ?? null,
       includes_studio: includesStudio,
+      short_notice: shortNotice,
       min_nights_applied: maxMinNights,
       language: payload.language ?? "de",
       hold_until: holdUntil,
@@ -144,7 +163,11 @@ export async function POST(request: Request) {
       console.error("E-Mail konnte nicht gesendet werden", error);
     }
 
-    return NextResponse.json({ id: docRef.id, holdUntil });
+    return NextResponse.json({
+      id: docRef.id,
+      holdUntil,
+      shortNotice
+    });
   } catch (error) {
     console.error("POST /api/public/hold failed", error);
     const message =

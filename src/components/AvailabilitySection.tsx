@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AvailabilityCalendar } from "@/components/AvailabilityCalendar";
+import {
+  isStudioRequired,
+  isStudioSelectable,
+  normalizeStudioSelection
+} from "@/lib/bookingRules";
 import { buildPlaceholderStatus } from "@/lib/availability";
 import type { DayStatusMap } from "@/lib/types";
 import type { SeasonDefinition } from "@/lib/seasonPricing";
@@ -9,9 +14,8 @@ import type { SeasonDefinition } from "@/lib/seasonPricing";
 export function AvailabilitySection({ locale = "de" }: { locale?: "de" | "en" }) {
   const [dayStatus, setDayStatus] = useState<DayStatusMap>(buildPlaceholderStatus());
   const [seasons, setSeasons] = useState<SeasonDefinition[]>([]);
-  const [filter, setFilter] = useState<
-    "ALL" | "FREE" | "BLOCKED" | "HOLD" | "CONFIRMED"
-  >("ALL");
+  const [guests, setGuests] = useState<number>(2);
+  const [includesStudio, setIncludesStudio] = useState<boolean>(false);
 
   useEffect(() => {
     async function load() {
@@ -41,46 +45,55 @@ export function AvailabilitySection({ locale = "de" }: { locale?: "de" | "en" })
     };
   }, [dayStatus]);
 
+  useEffect(() => {
+    setIncludesStudio((prev) => normalizeStudioSelection(guests, prev));
+  }, [guests]);
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2 text-xs">
-        <button
-          type="button"
-          className={`badge ${filter === "ALL" ? "border-ink" : ""}`}
-          onClick={() => setFilter("ALL")}
-        >
-          {locale === "en" ? "All" : "Alle"} ({counts.FREE + counts.BLOCKED + counts.HOLD + counts.CONFIRMED})
-        </button>
-        <button
-          type="button"
-          className={`badge ${filter === "FREE" ? "border-ink" : ""}`}
-          onClick={() => setFilter("FREE")}
-        >
-          {locale === "en" ? "Free" : "Frei"} ({counts.FREE})
-        </button>
-        <button
-          type="button"
-          className={`badge ${filter === "HOLD" ? "border-ink" : ""}`}
-          onClick={() => setFilter("HOLD")}
-        >
-          {locale === "en" ? "On hold" : "Reserviert"} ({counts.HOLD})
-        </button>
-        <button
-          type="button"
-          className={`badge ${filter === "CONFIRMED" ? "border-ink" : ""}`}
-          onClick={() => setFilter("CONFIRMED")}
-        >
-          {locale === "en" ? "Booked" : "Belegt"} ({counts.CONFIRMED})
-        </button>
-        <button
-          type="button"
-          className={`badge ${filter === "BLOCKED" ? "border-ink" : ""}`}
-          onClick={() => setFilter("BLOCKED")}
-        >
-          {locale === "en" ? "Blocked" : "Gesperrt"} ({counts.BLOCKED})
-        </button>
+      <div className="grid gap-3 md:grid-cols-2">
+        <div>
+          <label className="label">{locale === "en" ? "Guests for calendar price" : "Gäste für Kalenderpreis"}</label>
+          <input
+            type="number"
+            className="input"
+            min={1}
+            max={7}
+            value={guests}
+            onChange={(event) => {
+              const next = Number(event.target.value);
+              const clamped = Number.isFinite(next) ? Math.min(7, Math.max(1, next)) : 1;
+              setGuests(clamped);
+            }}
+          />
+        </div>
+        <label className="mt-7 flex items-center gap-2 text-sm text-ink/70">
+          <input
+            type="checkbox"
+            className="h-4 w-4"
+            checked={includesStudio}
+            disabled={isStudioRequired(guests) || !isStudioSelectable(guests)}
+            onChange={(event) =>
+              setIncludesStudio(normalizeStudioSelection(guests, event.target.checked))
+            }
+          />
+          {locale === "en"
+            ? "Show prices with studio"
+            : "Preise mit Studio anzeigen"}
+        </label>
       </div>
-      <AvailabilityCalendar dayStatus={dayStatus} filter={filter} seasons={seasons} locale={locale} />
+      <div className="text-xs text-ink/60">
+        {locale === "en"
+          ? `Free days: ${counts.FREE}. Non-free days are currently not available.`
+          : `Freie Tage: ${counts.FREE}. Nicht freie Tage sind aktuell nicht verfügbar.`}
+      </div>
+      <AvailabilityCalendar
+        dayStatus={dayStatus}
+        seasons={seasons}
+        locale={locale}
+        includesStudio={includesStudio}
+        legendStatuses={["FREE"]}
+      />
     </div>
   );
 }

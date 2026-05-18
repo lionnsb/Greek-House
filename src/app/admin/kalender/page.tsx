@@ -1,8 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { AvailabilityCalendar } from "@/components/AvailabilityCalendar";
 import type { AvailabilityBlock } from "@/lib/types";
 import { adminFetch } from "@/lib/adminFetch";
+import type { DayStatusMap } from "@/lib/types";
+import type { SeasonDefinition } from "@/lib/seasonPricing";
+import { buildPlaceholderStatus } from "@/lib/availability";
 
 type FormState = {
   startDate: string;
@@ -13,6 +17,9 @@ type FormState = {
 export default function AdminKalenderPage() {
   const [items, setItems] = useState<AvailabilityBlock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [includeExpired, setIncludeExpired] = useState(false);
+  const [dayStatus, setDayStatus] = useState<DayStatusMap>(buildPlaceholderStatus());
+  const [seasons, setSeasons] = useState<SeasonDefinition[]>([]);
   const [form, setForm] = useState<FormState>({
     startDate: "",
     endDate: "",
@@ -23,20 +30,28 @@ export default function AdminKalenderPage() {
   );
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const response = await adminFetch("/api/admin/blocks");
-        const data = await response.json();
-        setItems(data.items ?? []);
-      } catch {
-        setItems([]);
-      } finally {
-        setLoading(false);
-      }
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [blocksResponse, availabilityResponse] = await Promise.all([
+        adminFetch(`/api/admin/blocks${includeExpired ? "?includeExpired=1" : ""}`),
+        adminFetch("/api/public/availability")
+      ]);
+      const blocksData = await blocksResponse.json();
+      const availabilityData = await availabilityResponse.json();
+      setItems(blocksData.items ?? []);
+      setDayStatus(availabilityData.dayStatus ?? buildPlaceholderStatus());
+      setSeasons(availabilityData.seasons ?? []);
+    } catch {
+      setItems([]);
+    } finally {
+      setLoading(false);
     }
-    load();
-  }, []);
+  }, [includeExpired]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
 
   async function handleCreateBlock(event: React.FormEvent<HTMLFormElement>) {
@@ -67,6 +82,7 @@ export default function AdminKalenderPage() {
       ]);
       setForm({ startDate: "", endDate: "", reason: "" });
       setStatus("success");
+      await loadData();
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "Fehler");
@@ -84,6 +100,7 @@ export default function AdminKalenderPage() {
         throw new Error(data?.message ?? "Löschen fehlgeschlagen.");
       }
       setItems((prev) => prev.filter((item) => item.id !== id));
+      await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Fehler beim Löschen");
     }
@@ -96,6 +113,13 @@ export default function AdminKalenderPage() {
       <p className="mt-2 text-sm text-ink/70">
         Sperrzeiten hinzufügen und entfernen.
       </p>
+      <div className="mt-4">
+        <AvailabilityCalendar
+          dayStatus={dayStatus}
+          seasons={seasons}
+          legendStatuses={["FREE", "BLOCKED", "HOLD", "CONFIRMED"]}
+        />
+      </div>
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <form className="card grid gap-4 p-6" onSubmit={handleCreateBlock}>
           <h2 className="text-lg font-semibold">Neue Sperre</h2>
@@ -148,6 +172,15 @@ export default function AdminKalenderPage() {
         </form>
         <div>
           <h2 className="text-lg font-semibold">Aktuelle Sperren</h2>
+          <label className="mt-3 flex items-center gap-2 text-sm text-ink/70">
+            <input
+              type="checkbox"
+              className="h-4 w-4"
+              checked={includeExpired}
+              onChange={(event) => setIncludeExpired(event.target.checked)}
+            />
+            Abgelaufene Sperren anzeigen
+          </label>
           <div className="mt-4 grid gap-3">
             {loading && <p className="text-sm text-ink/70">Lade...</p>}
             {!loading && items.length === 0 && (

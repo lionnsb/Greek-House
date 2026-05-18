@@ -8,7 +8,7 @@ const houseHighlights = [
   "Große Terrasse mit 30 m² Pool",
   "Außenküche mit Gasgrill (Plancher)",
   "Zwei Schlafzimmer & zwei Badezimmer",
-  "Zusätzliches Studio mit eigenem Bad"
+  "Integriertes Studio mit eigenem Bad (optional)"
 ];
 
 const studioHighlights = [
@@ -16,11 +16,11 @@ const studioHighlights = [
   "Zugang über die Terrasse",
   "Doppelbett 140 x 200",
   "Klimaanlage & Standventilator",
-  "Nur zusammen mit dem Haus buchbar"
+  "Nur zusammen mit dem Apartmentbereich buchbar"
 ];
 
 const rooms = [
-  { title: "Kochen, Essen, Wohnen", description: "Voll ausgestattete Küche mit Induktionsherd, Backofen, Spülmaschine und Waschmaschine. Innen- und Außenküche mit Gasgrill (Plancher)." },
+  { title: "Kochen, Essen, Wohnen", description: "Voll ausgestattete Küche mit Backofen, Spülmaschine und Waschmaschine. Innen- und Außenküche mit Gasgrill (Plancher)." },
   { title: "Master-Schlafzimmer", description: "Doppelbett 160 x 200, offener Kleiderschrank, Safe. Duschbad über den Flur erreichbar." },
   { title: "Zweites Schlafzimmer", description: "Doppelbett 160 x 200 + Stockbett 90 x 200, Ensuite-Bad und eigene Terrasse mit Meerblick." },
   { title: "Bäder", description: "Alle Bäder mit Regendusche, Handbrause, Waschtisch und Popodusche." },
@@ -44,11 +44,11 @@ export default function HausPage() {
         <div className="container grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="badge">Mati tis Thalassas</p>
-            <h1 className="mt-4 text-3xl font-semibold">Das Haus</h1>
+            <h1 className="mt-4 text-3xl font-semibold">Das Apartment</h1>
             <p className="mt-4 text-base text-ink/70">
-              Unser Ferienhaus in Kastraki auf Naxos bietet Platz für Familien
-              und Gruppen. Großzügige Wohnbereiche, ruhige Schlafzimmer, eine
-              hochwertige Küche und einladende Außenflächen.
+              Unser Apartmentbereich in Kastraki auf Naxos bietet Platz für
+              Familien und Gruppen. Das Apartment befindet sich in einem Haus,
+              in dem ein weiterer Bereich privat genutzt wird.
             </p>
             <ul className="mt-6 grid gap-3 text-sm text-ink/70">
               {houseHighlights.map((item) => (
@@ -103,10 +103,11 @@ export default function HausPage() {
       <section className="section">
         <div className="container grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
-            <h2 className="text-2xl font-semibold">Studio (optional)</h2>
+            <h2 id="studio" className="text-2xl font-semibold scroll-mt-24">Studio (optional, integriert)</h2>
             <p className="mt-4 text-sm text-ink/70">
-              Das Studio ist ein separater Bereich und kann nur zusammen mit dem
-              Haus gebucht werden. Ideal für zusätzliche Privatsphäre.
+              Das Studio ist in den Apartmentbereich integriert und kann nur
+              zusammen mit dem Apartment gebucht werden. Ideal für zusätzliche
+              Privatsphäre.
             </p>
             <ul className="mt-4 grid gap-3 text-sm text-ink/70">
               {studioHighlights.map((item) => (
@@ -128,7 +129,7 @@ export default function HausPage() {
           <div>
             <h2 className="text-2xl font-semibold">Lage & Umgebung</h2>
             <p className="mt-4 text-sm text-ink/70">
-              Die Villa liegt in Kastraki – nur ca. 50 Meter vom Meer und einem
+              Der Apartmentbereich liegt in Kastraki – nur ca. 50 Meter vom Meer und einem
               kleinen Strand entfernt. Nach rechts erreichst du nach ca. 250 m
               den 2 km langen Sahara Beach, nach links nach ca. 350 m den 3 km
               langen Glyfada Beach. Beide Strände sind auch in der Hauptsaison
@@ -151,11 +152,12 @@ export default function HausPage() {
 
       <section className="section bg-white">
         <div className="container">
-          <h2 className="text-2xl font-semibold">Hausregeln</h2>
+          <h2 id="hausregeln" className="text-2xl font-semibold scroll-mt-24">Hausregeln</h2>
           <ul className="mt-4 grid gap-3 text-sm text-ink/70">
             <li>Check-in ab 16:00 Uhr, Check-out bis 10:00 Uhr</li>
             <li>Nichtraucherhaus</li>
-            <li>Haustiere nach Absprache</li>
+            <li>KEINE HAUSTIERE</li>
+            <li>Rücksicht auf den privat genutzten Apartmentbereich im selben Haus</li>
           </ul>
         </div>
       </section>

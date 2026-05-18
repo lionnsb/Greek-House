@@ -3,7 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Reservation } from "@/lib/types";
 import { adminFetch } from "@/lib/adminFetch";
-import { calculateTotal } from "@/lib/pricing";
+import {
+  isStudioRequired,
+  isStudioSelectable,
+  MAX_GUESTS,
+  normalizeStudioSelection
+} from "@/lib/bookingRules";
 import { buildSeasonsFromEnv, calculateSeasonalTotal } from "@/lib/seasonPricing";
 import type { SeasonDefinition } from "@/lib/seasonPricing";
 
@@ -25,8 +30,6 @@ type FormValues = {
 };
 
 export default function AdminAnfragenPage() {
-  const MAX_GUESTS = 7;
-  const STUDIO_REQUIRED_FROM_GUESTS = 6;
   const [items, setItems] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [actions, setActions] = useState<Record<string, ActionState>>({});
@@ -39,8 +42,6 @@ export default function AdminAnfragenPage() {
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Record<string, boolean>>({});
 
-  const pricePerNight = Number(process.env.NEXT_PUBLIC_PRICE_PER_NIGHT ?? "0");
-  const studioSurchargePerNight = Number(process.env.NEXT_PUBLIC_STUDIO_SURCHARGE_PER_NIGHT ?? "0");
   const [seasons, setSeasons] = useState<SeasonDefinition[]>(buildSeasonsFromEnv());
 
   const sortedItems = useMemo(() => {
@@ -71,7 +72,7 @@ export default function AdminAnfragenPage() {
         setItems(data.items ?? []);
         const nextFormValues: typeof formValues = {};
         (data.items ?? []).forEach((item: Reservation) => {
-          const studioRequired = Number(item.guests) >= STUDIO_REQUIRED_FROM_GUESTS;
+          const studioRequired = isStudioRequired(Number(item.guests));
           nextFormValues[item.id] = {
             priceTotal: item.priceTotal?.toString() ?? "",
             depositAmount: item.depositAmount?.toString() ?? "",
@@ -79,7 +80,9 @@ export default function AdminAnfragenPage() {
             startDate: item.startDate,
             endDate: item.endDate,
             guests: item.guests?.toString() ?? "",
-            includesStudio: studioRequired ? true : item.includesStudio,
+            includesStudio: studioRequired
+              ? true
+              : normalizeStudioSelection(Number(item.guests), item.includesStudio),
             message: item.message ?? ""
           };
         });
@@ -148,13 +151,9 @@ export default function AdminAnfragenPage() {
 
     const nextGuests =
       field === "guests" ? Number(value) : Number(current.guests);
-    const studioRequired = Number.isFinite(nextGuests) && nextGuests >= STUDIO_REQUIRED_FROM_GUESTS;
-    const nextIncludesStudio =
-      studioRequired
-        ? true
-        : field === "includesStudio"
-          ? Boolean(value)
-          : current.includesStudio;
+    const studioRequested =
+      field === "includesStudio" ? Boolean(value) : current.includesStudio;
+    const nextIncludesStudio = normalizeStudioSelection(nextGuests, studioRequested);
 
     setFormValues((prev) => ({
       ...prev,
@@ -396,13 +395,6 @@ export default function AdminAnfragenPage() {
             isRejected && reactivatableUntil
               ? reactivatableUntil >= new Date().toISOString()
               : false;
-          const pricing = calculateTotal({
-            startDate: item.startDate,
-            endDate: item.endDate,
-            includesStudio: item.includesStudio,
-            pricePerNight,
-            studioSurchargePerNight
-          });
           const seasonal = calculateSeasonalTotal({
             startDate: item.startDate,
             endDate: item.endDate,
@@ -413,39 +405,7 @@ export default function AdminAnfragenPage() {
             isAccepted &&
             item.paymentDueUntil &&
             item.paymentDueUntil < new Date().toISOString();
-
-          async function deleteReservation(id: string) {
-    if (!confirm("Buchung wirklich löschen?")) return;
-    setActions((prev) => ({
-      ...prev,
-      [id]: { loading: true, error: null, success: null }
-    }));
-    try {
-      const response = await adminFetch(`/api/admin/reservations/${id}`, {
-        method: "DELETE"
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data?.message ?? "Löschen fehlgeschlagen");
-      }
-      setItems((prev) => prev.filter((item) => item.id !== id));
-      setActions((prev) => ({
-        ...prev,
-        [id]: { loading: false, error: null, success: "Gelöscht." }
-      }));
-    } catch (err) {
-      setActions((prev) => ({
-        ...prev,
-        [id]: {
-          loading: false,
-          error: err instanceof Error ? err.message : "Fehler",
-          success: null
-        }
-      }));
-    }
-  }
-
-  return (
+          return (
             <div
               key={item.id}
               className={`card p-6 ${
@@ -618,7 +578,10 @@ export default function AdminAnfragenPage() {
                       type="checkbox"
                       className="h-4 w-4"
                       checked={form.includesStudio}
-                      disabled={Number(form.guests) >= STUDIO_REQUIRED_FROM_GUESTS}
+                      disabled={
+                        isStudioRequired(Number(form.guests)) ||
+                        !isStudioSelectable(Number(form.guests))
+                      }
                       onChange={(event) =>
                         updateFormValue(item.id, "includesStudio", event.target.checked)
                       }
@@ -640,22 +603,19 @@ export default function AdminAnfragenPage() {
                     <button
                       type="button"
                       className="btn"
-                      onClick={() =>
-                        {
-                          const guestCount = Number(form.guests);
-                          const normalizedIncludesStudio =
-                            guestCount >= STUDIO_REQUIRED_FROM_GUESTS
-                              ? true
-                              : form.includesStudio;
-                          updateReservation(item.id, {
-                            startDate: form.startDate,
-                            endDate: form.endDate,
-                            guests: Number(form.guests),
-                            includesStudio: normalizedIncludesStudio,
-                            message: form.message
-                          });
-                        }
-                      }
+                      onClick={() => {
+                        const guestCount = Number(form.guests);
+                        updateReservation(item.id, {
+                          startDate: form.startDate,
+                          endDate: form.endDate,
+                          guests: guestCount,
+                          includesStudio: normalizeStudioSelection(
+                            guestCount,
+                            form.includesStudio
+                          ),
+                          message: form.message
+                        });
+                      }}
                     >
                       Änderungen speichern
                     </button>
@@ -679,14 +639,9 @@ export default function AdminAnfragenPage() {
                     />
                   </div>
                   <div className="mt-2 text-xs text-ink/60">
-                    {pricing.nights} Nächte · Basis {pricePerNight}€/Nacht
-                    {item.includesStudio
-                      ? ` · Studio +${studioSurchargePerNight}€/Nacht`
-                      : ""}
+                    {seasonal.nights} Nächte
                     {seasonal.total > 0 && (
-                      <span className="ml-2">
-                        · Saisonpreis: {seasonal.total.toFixed(0)} EUR
-                      </span>
+                      <span className="ml-2">· Saisonpreis inkl. Reinigung: {seasonal.total.toFixed(0)} EUR</span>
                     )}
                   </div>
                 </div>

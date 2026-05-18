@@ -1,4 +1,5 @@
 import { differenceInCalendarDays, parseISO } from "date-fns";
+import { APARTMENT_CLEANING_FEE, STUDIO_CLEANING_FEE } from "@/lib/bookingRules";
 
 export function nightsBetween(startDate: string, endDate: string) {
   const start = parseISO(startDate);
@@ -22,5 +23,14 @@ export function calculateTotal({
   const nights = nightsBetween(startDate, endDate);
   const base = nights * pricePerNight;
   const studio = includesStudio ? nights * studioSurchargePerNight : 0;
-  return { nights, base, studio, total: base + studio };
+  const cleaningApartment = nights > 0 ? APARTMENT_CLEANING_FEE : 0;
+  const cleaningStudio = includesStudio && nights > 0 ? STUDIO_CLEANING_FEE : 0;
+  return {
+    nights,
+    base,
+    studio,
+    cleaningApartment,
+    cleaningStudio,
+    total: base + studio + cleaningApartment + cleaningStudio
+  };
 }

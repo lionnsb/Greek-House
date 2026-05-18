@@ -2,10 +2,6 @@ import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { requireAdmin } from "@/lib/adminAuth";
 
-function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
-  return aStart < bEnd && bStart < aEnd;
-}
-
 export async function GET(request: Request) {
   try {
     await requireAdmin(request);
@@ -48,23 +44,10 @@ export async function POST(request: Request) {
   const studioSurchargePerNight = Number(payload.studioSurchargePerNight ?? 0);
   const minNights = Number(payload.minNights ?? 1);
 
-  if (!name || !startDate || !endDate || startDate >= endDate) {
+  if (!name || !startDate || !endDate || startDate > endDate) {
     return NextResponse.json(
       { message: "Ungültige Saison-Daten." },
       { status: 400 }
-    );
-  }
-
-  const snap = await adminDb.collection("pricing_seasons").get();
-  const conflict = snap.docs.some((doc) => {
-    const data = doc.data();
-    return overlaps(startDate, endDate, data.start_date, data.end_date);
-  });
-
-  if (conflict) {
-    return NextResponse.json(
-      { message: "Saison überschneidet eine bestehende Saison." },
-      { status: 409 }
     );
   }
 

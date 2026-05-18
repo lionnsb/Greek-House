@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ImageGrid } from "@/components/ImageGrid";
-import { heroImages, homeGalleryImages } from "@/lib/imageSelection";
+import { homeGalleryImages } from "@/lib/imageSelection";
 
 const highlights = [
-  "50 m to the sea and a small beach",
+  "About 50 m to the sea and a small beach",
   "Large terrace with 30 m² pool",
   "Outdoor kitchen with gas grill (plancha)",
   "Two bedrooms + two bathrooms",
@@ -19,29 +19,29 @@ export default function HomePageEn() {
           <div>
             <p className="badge">Mati tis Thalassas · Kastraki, Naxos</p>
             <h1 className="mt-6 text-4xl font-semibold leading-tight">
-              Villa with sea view, pool & studio – just 50 m to the beach.
+              Apartment area with pool, sea view and optional studio.
             </h1>
             <p className="mt-4 text-base text-ink/70">
-              Exclusive ground‑floor apartment with a large terrace, 30 m² pool,
-              outdoor kitchen and optional studio. Perfect for families, friends
-              or a relaxed island stay.
+              Exclusive ground-floor apartment with a large terrace, 30 m² pool
+              and outdoor kitchen. The apartment is part of a house that also
+              contains another privately used apartment area.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/en/verfuegbarkeit" className="btn">
                 Check availability
               </Link>
               <Link href="/en/haus" className="btn-outline">
-                Explore the house
+                Explore the apartment
               </Link>
             </div>
-            <div className="mt-8 grid gap-3 text-sm text-ink/70 sm:grid-cols-2">
-              <div className="card p-4">50 m to the sea</div>
-              <div className="card p-4">30 m² pool</div>
-              <div className="card p-4">Outdoor kitchen + grill</div>
-              <div className="card p-4">Studio optional</div>
-            </div>
           </div>
-          <ImageGrid files={heroImages} className="sm:grid-cols-2" aspect="aspect-square" />
+          <div className="overflow-hidden rounded-2xl border border-stone bg-stone/40">
+            <img
+              src="/img/IMG_2806.JPG"
+              alt="Pool and sea view of the apartment area"
+              className="h-full w-full object-cover"
+            />
+          </div>
         </div>
       </section>
 

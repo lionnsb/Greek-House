@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { format } from "date-fns";
+import { reservationBlocksUntil } from "@/lib/bookingRules";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { requireAdmin } from "@/lib/adminAuth";
 
@@ -14,6 +16,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ message }, { status: 401 });
   }
 
+  const includeExpired =
+    new URL(request.url).searchParams.get("includeExpired") === "1";
+  const todayKey = format(new Date(), "yyyy-MM-dd");
   const snap = await adminDb.collection("availability_blocks").get();
   const items = snap.docs.map((doc) => {
     const data = doc.data();
@@ -24,7 +29,9 @@ export async function GET(request: Request) {
       reason: data.reason ?? null,
       createdAt: data.created_at
     };
-  });
+  })
+  .filter((item) => includeExpired || item.endDate >= todayKey)
+  .sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
 
   return NextResponse.json({ items });
 }
@@ -56,7 +63,7 @@ export async function POST(request: Request) {
 
   const hasConfirmedConflict = reservationsSnap.docs.some((doc) => {
     const data = doc.data();
-    return overlaps(startDate, endDate, data.start_date, data.end_date);
+    return overlaps(startDate, endDate, data.start_date, reservationBlocksUntil(data.end_date));
   });
 
   if (hasConfirmedConflict) {
@@ -67,8 +74,12 @@ export async function POST(request: Request) {
   }
 
   const blocksSnap = await adminDb.collection("availability_blocks").get();
+  const todayKeyForCreate = format(new Date(), "yyyy-MM-dd");
   const hasBlockConflict = blocksSnap.docs.some((doc) => {
     const data = doc.data();
+    if (data.end_date && data.end_date < todayKeyForCreate) {
+      return false;
+    }
     return overlaps(startDate, endDate, data.start_date, data.end_date);
   });
 
