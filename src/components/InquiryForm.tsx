@@ -113,6 +113,11 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
           ? "Minimum stay depends on season. A note will appear automatically."
           : "Mindestaufenthalt abhängig von Saison. Hinweis erscheint automatisch."}
       </div>
+      <div className="text-xs text-ink/60">
+        {locale === "en"
+          ? "Night calculation: arrival day included, departure day excluded."
+          : "Nachtberechnung: Anreisetag inklusive, Abreisetag exklusive."}
+      </div>
       {shortNotice && (
         <p className="text-sm text-amber-700">
           {locale === "en"

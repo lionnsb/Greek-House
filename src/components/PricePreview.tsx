@@ -40,13 +40,16 @@ export function PricePreview({
       apartmentPrice: number;
       studioPrice: number;
       total: number;
+      startDate: string;
+      endDate: string;
     }>
   >((acc, item) => {
+    const last = acc[acc.length - 1];
     const key = `${item.season}__${item.apartmentPrice}__${item.studioPrice}`;
-    const existing = acc.find((entry) => entry.key === key);
-    if (existing) {
-      existing.nights += 1;
-      existing.total += item.totalPrice;
+    if (last && last.key === key) {
+      last.nights += 1;
+      last.total += item.totalPrice;
+      last.endDate = item.date;
       return acc;
     }
     acc.push({
@@ -55,7 +58,9 @@ export function PricePreview({
       nights: 1,
       apartmentPrice: item.apartmentPrice,
       studioPrice: item.studioPrice,
-      total: item.totalPrice
+      total: item.totalPrice,
+      startDate: item.date,
+      endDate: item.date
     });
     return acc;
   }, []);
@@ -91,11 +96,11 @@ export function PricePreview({
         {locale === "en" ? "Price breakdown" : "Preisaufschlüsselung"}
       </p>
       <div className="mt-2 space-y-1 text-xs">
-        {groupedBySeason.map((entry) => (
-          <p key={entry.key}>
+        {groupedBySeason.map((entry, index) => (
+          <p key={`${entry.key}_${index}`}>
             {locale === "en"
-              ? `${entry.season}: ${entry.total.toFixed(0)}€ (${entry.nights} nights x ${(entry.apartmentPrice + entry.studioPrice).toFixed(0)}€)`
-              : `${entry.season}: ${entry.total.toFixed(0)}€ (${entry.nights} Nächte x ${(entry.apartmentPrice + entry.studioPrice).toFixed(0)}€)`}
+              ? `${entry.season} (${entry.startDate} to ${entry.endDate}): ${entry.total.toFixed(0)}€ (${entry.nights} nights x ${(entry.apartmentPrice + entry.studioPrice).toFixed(0)}€)`
+              : `${entry.season} (${entry.startDate} bis ${entry.endDate}): ${entry.total.toFixed(0)}€ (${entry.nights} Nächte x ${(entry.apartmentPrice + entry.studioPrice).toFixed(0)}€)`}
           </p>
         ))}
         <p>

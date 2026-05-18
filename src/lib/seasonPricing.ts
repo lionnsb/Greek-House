@@ -27,19 +27,6 @@ function isFallbackStandardSeason(season: SeasonDefinition) {
   );
 }
 
-function seasonPriority(season: SeasonDefinition) {
-  const normalized = normalizeSeasonName(season.name);
-  if (isFallbackStandardSeason(season)) return -100;
-  if (normalized === "standard") return 35;
-  if (normalized === "hauptsaison" || normalized === "highseason" || normalized === "sommer") {
-    return 50;
-  }
-  if (normalized === "vorsaison" || normalized === "preseason") return 40;
-  if (normalized === "nachsaison" || normalized === "postseason") return 30;
-  if (normalized === "winter") return 20;
-  return 10;
-}
-
 function seasonSpanDays(season: SeasonDefinition) {
   return Math.max(
     1,
@@ -49,8 +36,9 @@ function seasonSpanDays(season: SeasonDefinition) {
 
 function sortSeasonCandidates(seasons: SeasonDefinition[]) {
   return [...seasons].sort((a, b) => {
-    const priorityDelta = seasonPriority(b) - seasonPriority(a);
-    if (priorityDelta !== 0) return priorityDelta;
+    if (isFallbackStandardSeason(a) !== isFallbackStandardSeason(b)) {
+      return isFallbackStandardSeason(a) ? 1 : -1;
+    }
     const spanDelta = seasonSpanDays(a) - seasonSpanDays(b);
     if (spanDelta !== 0) return spanDelta;
     const createdAtA = a.createdAt ?? "";
