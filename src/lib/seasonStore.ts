@@ -9,6 +9,7 @@ export function mapDbSeasons(items: PricingSeason[]): SeasonDefinition[] {
     end: item.endDate,
     pricePerNight: item.pricePerNight,
     studioSurchargePerNight: item.studioSurchargePerNight,
-    minNights: item.minNights
+    minNights: item.minNights,
+    createdAt: item.createdAt
   }));
 }

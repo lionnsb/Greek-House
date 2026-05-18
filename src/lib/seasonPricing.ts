@@ -1,4 +1,4 @@
-import { addDays, format, parseISO } from "date-fns";
+import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import {
   APARTMENT_CLEANING_FEE,
   STUDIO_CLEANING_FEE
@@ -12,15 +12,25 @@ export type SeasonDefinition = {
   pricePerNight: number;
   studioSurchargePerNight: number;
   minNights: number;
+  createdAt?: string;
 };
 
 function normalizeSeasonName(name: string) {
   return name.trim().toLowerCase();
 }
 
-function seasonPriority(name: string) {
-  const normalized = normalizeSeasonName(name);
-  if (normalized === "standard") return -100;
+function isFallbackStandardSeason(season: SeasonDefinition) {
+  return (
+    normalizeSeasonName(season.name) === "standard" &&
+    season.start === "1900-01-01" &&
+    season.end === "3000-01-01"
+  );
+}
+
+function seasonPriority(season: SeasonDefinition) {
+  const normalized = normalizeSeasonName(season.name);
+  if (isFallbackStandardSeason(season)) return -100;
+  if (normalized === "standard") return 35;
   if (normalized === "hauptsaison" || normalized === "highseason" || normalized === "sommer") {
     return 50;
   }
@@ -30,10 +40,22 @@ function seasonPriority(name: string) {
   return 10;
 }
 
+function seasonSpanDays(season: SeasonDefinition) {
+  return Math.max(
+    1,
+    differenceInCalendarDays(parseISO(season.end), parseISO(season.start)) + 1
+  );
+}
+
 function sortSeasonCandidates(seasons: SeasonDefinition[]) {
   return [...seasons].sort((a, b) => {
-    const priorityDelta = seasonPriority(b.name) - seasonPriority(a.name);
+    const priorityDelta = seasonPriority(b) - seasonPriority(a);
     if (priorityDelta !== 0) return priorityDelta;
+    const spanDelta = seasonSpanDays(a) - seasonSpanDays(b);
+    if (spanDelta !== 0) return spanDelta;
+    const createdAtA = a.createdAt ?? "";
+    const createdAtB = b.createdAt ?? "";
+    if (createdAtA !== createdAtB) return createdAtA < createdAtB ? 1 : -1;
     if (a.start === b.start) return 0;
     return a.start < b.start ? 1 : -1;
   });

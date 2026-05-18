@@ -65,7 +65,8 @@ export async function POST(request: Request) {
         end: data.end_date,
         pricePerNight: data.price_per_night,
         studioSurchargePerNight: data.studio_surcharge_per_night,
-        minNights: data.min_nights ?? 1
+        minNights: data.min_nights ?? 1,
+        createdAt: data.created_at
       };
     });
     const seasonList = seasons.length ? seasons : buildSeasonsFromEnv();

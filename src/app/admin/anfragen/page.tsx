@@ -103,13 +103,14 @@ export default function AdminAnfragenPage() {
         const data = await response.json();
         if (data?.items?.length) {
           setSeasons(
-            data.items.map((item: { name: string; startDate: string; endDate: string; pricePerNight: number; studioSurchargePerNight: number; minNights: number }) => ({
+            data.items.map((item: { name: string; startDate: string; endDate: string; pricePerNight: number; studioSurchargePerNight: number; minNights: number; createdAt?: string }) => ({
               name: item.name,
               start: item.startDate,
               end: item.endDate,
               pricePerNight: item.pricePerNight,
               studioSurchargePerNight: item.studioSurchargePerNight,
-              minNights: item.minNights ?? 1
+              minNights: item.minNights ?? 1,
+              createdAt: item.createdAt
             }))
           );
         }
