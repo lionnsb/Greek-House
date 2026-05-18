@@ -9,23 +9,26 @@ import { seasonForDate } from "@/lib/seasonPricing";
 
 const statusStyles: Record<string, string> = {
   FREE: "bg-emerald-50 text-emerald-900 border-emerald-200",
-  BLOCKED: "bg-slate-200 text-slate-800 border-slate-300",
   HOLD: "bg-amber-50 text-amber-900 border-amber-200",
-  CONFIRMED: "bg-rose-50 text-rose-900 border-rose-200"
+  BLOCKED: "bg-slate-200 text-slate-800 border-slate-300",
+  CONFIRMED: "bg-rose-100 text-rose-900 border-rose-300",
+  BOOKED: "bg-rose-100 text-rose-900 border-rose-300"
 };
 
 const statusLabelsDe: Record<string, string> = {
   FREE: "Frei",
   BLOCKED: "Gesperrt",
   HOLD: "Reserviert",
-  CONFIRMED: "Belegt"
+  CONFIRMED: "Belegt",
+  BOOKED: "Belegt"
 };
 
 const statusLabelsEn: Record<string, string> = {
   FREE: "Free",
   BLOCKED: "Blocked",
   HOLD: "On hold",
-  CONFIRMED: "Booked"
+  CONFIRMED: "Booked",
+  BOOKED: "Booked"
 };
 
 export function AvailabilityCalendar({
@@ -104,7 +107,9 @@ export function AvailabilityCalendar({
           const minStay =
             season && season.minNights ? ` · Min. ${season.minNights}N` : "";
           const statusLabel =
-            locale === "en" ? statusLabelsEn[status] : statusLabelsDe[status];
+            locale === "en"
+              ? statusLabelsEn[status] ?? status
+              : statusLabelsDe[status] ?? status;
           return (
             <div
               key={key}

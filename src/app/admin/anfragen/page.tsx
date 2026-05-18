@@ -274,10 +274,16 @@ export default function AdminAnfragenPage() {
   }
 
   function applyAutoPrice(item: Reservation) {
+    const form = formValues[item.id];
+    const startDate = form?.startDate ?? item.startDate;
+    const endDate = form?.endDate ?? item.endDate;
+    const guests = Number(form?.guests ?? item.guests ?? 0);
+    const requestedStudio = form?.includesStudio ?? item.includesStudio;
+    const includesStudio = normalizeStudioSelection(guests, requestedStudio);
     const seasonal = calculateSeasonalTotal({
-      startDate: item.startDate,
-      endDate: item.endDate,
-      includesStudio: item.includesStudio,
+      startDate,
+      endDate,
+      includesStudio,
       seasons
     });
 
@@ -396,9 +402,12 @@ export default function AdminAnfragenPage() {
               ? reactivatableUntil >= new Date().toISOString()
               : false;
           const seasonal = calculateSeasonalTotal({
-            startDate: item.startDate,
-            endDate: item.endDate,
-            includesStudio: item.includesStudio,
+            startDate: form.startDate,
+            endDate: form.endDate,
+            includesStudio: normalizeStudioSelection(
+              Number(form.guests),
+              form.includesStudio
+            ),
             seasons
           });
           const isOverdue =

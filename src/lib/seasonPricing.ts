@@ -1,4 +1,4 @@
-import { parseISO } from "date-fns";
+import { addDays, format, parseISO } from "date-fns";
 import {
   APARTMENT_CLEANING_FEE,
   STUDIO_CLEANING_FEE
@@ -147,7 +147,8 @@ export function calculateSeasonalTotal({
 
   let cursor = parseISO(startDate);
   for (let i = 0; i < nights; i += 1) {
-    const date = cursor.toISOString().slice(0, 10);
+    // Use local calendar day formatting to avoid UTC timezone drift.
+    const date = format(cursor, "yyyy-MM-dd");
     const season = seasonForDate(date, seasons);
     const apartmentPrice = season?.pricePerNight ?? 0;
     const studioPrice = includesStudio ? season?.studioSurchargePerNight ?? 0 : 0;
@@ -160,7 +161,7 @@ export function calculateSeasonalTotal({
       totalPrice,
       minNights: season?.minNights ?? 1
     });
-    cursor = new Date(cursor.getTime() + 24 * 60 * 60 * 1000);
+    cursor = addDays(cursor, 1);
   }
 
   const apartmentNightlyTotal = breakdown.reduce((sum, item) => sum + item.apartmentPrice, 0);

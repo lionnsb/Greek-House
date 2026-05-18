@@ -85,7 +85,7 @@ export default function HausPage() {
             ))}
           </div>
           <div className="mt-8">
-            <h3 className="text-lg font-semibold">Galerie Haus</h3>
+            <h3 className="text-lg font-semibold">Galerie Apartmentbereich</h3>
             <div className="mt-4">
               <ImageGrid files={houseGalleryImages} className="md:grid-cols-3" aspect="aspect-[4/3]" />
             </div>
@@ -152,11 +152,13 @@ export default function HausPage() {
 
       <section className="section bg-white">
         <div className="container">
-          <h2 id="hausregeln" className="text-2xl font-semibold scroll-mt-24">Hausregeln</h2>
+          <h2 id="apartmentregeln" className="text-2xl font-semibold scroll-mt-24">
+            Hausregeln für das Apartment
+          </h2>
           <ul className="mt-4 grid gap-3 text-sm text-ink/70">
             <li>Check-in ab 16:00 Uhr, Check-out bis 10:00 Uhr</li>
-            <li>Nichtraucherhaus</li>
-            <li>KEINE HAUSTIERE</li>
+            <li>Nichtraucher-Apartmentbereich</li>
+            <li><strong>KEINE HAUSTIERE.</strong></li>
             <li>Rücksicht auf den privat genutzten Apartmentbereich im selben Haus</li>
           </ul>
         </div>

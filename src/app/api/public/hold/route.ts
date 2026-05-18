@@ -42,6 +42,18 @@ export async function POST(request: Request) {
     }
     const includesStudio = normalizeStudioSelection(guests, Boolean(payload.includesStudio));
     const shortNotice = hasShortNotice(payload.startDate);
+    const shortNoticeWarningDe =
+      "Achtung: Wir können die Verfügbarkeit für Ihren gewünschten Termin aufgrund der kurzfristigen Anfrage nicht garantieren.";
+    const shortNoticeWarningEn =
+      "Attention: We cannot guarantee availability for this short-notice request.";
+    const shortNoticeWarning =
+      shortNotice
+        ? (payload.language === "en" ? shortNoticeWarningEn : shortNoticeWarningDe)
+        : "";
+    const baseMessage = payload.message?.trim() ?? "";
+    const enrichedMessage = shortNoticeWarning
+      ? [baseMessage, shortNoticeWarning].filter(Boolean).join("\n")
+      : baseMessage || null;
 
     const blocksSnap = await adminDb.collection("availability_blocks").get();
     const seasonsSnap = await adminDb.collection("pricing_seasons").get();
@@ -113,7 +125,7 @@ export async function POST(request: Request) {
       email: payload.email,
       phone: payload.phone ?? null,
       guests,
-      message: payload.message ?? null,
+      message: enrichedMessage,
       includes_studio: includesStudio,
       short_notice: shortNotice,
       min_nights_applied: maxMinNights,
@@ -133,6 +145,7 @@ export async function POST(request: Request) {
         endDate: payload.endDate,
         reservationId: docRef.id,
         includesStudio,
+        shortNotice,
         language: payload.language ?? "de"
       });
 
@@ -153,7 +166,8 @@ export async function POST(request: Request) {
             startDate: payload.startDate,
             endDate: payload.endDate,
             includesStudio,
-            message: payload.message ?? null,
+            message: enrichedMessage,
+            shortNotice,
             reservationId: docRef.id,
             language: payload.language ?? "de"
           })

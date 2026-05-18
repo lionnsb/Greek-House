@@ -92,7 +92,7 @@ export function AvailabilitySection({ locale = "de" }: { locale?: "de" | "en" })
         seasons={seasons}
         locale={locale}
         includesStudio={includesStudio}
-        legendStatuses={["FREE"]}
+        legendStatuses={["FREE", "HOLD", "BLOCKED", "CONFIRMED"]}
       />
     </div>
   );

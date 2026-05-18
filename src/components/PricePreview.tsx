@@ -32,6 +32,33 @@ export function PricePreview({
     includesStudio,
     seasons
   });
+  const groupedBySeason = pricing.breakdown.reduce<
+    Array<{
+      key: string;
+      season: string;
+      nights: number;
+      apartmentPrice: number;
+      studioPrice: number;
+      total: number;
+    }>
+  >((acc, item) => {
+    const key = `${item.season}__${item.apartmentPrice}__${item.studioPrice}`;
+    const existing = acc.find((entry) => entry.key === key);
+    if (existing) {
+      existing.nights += 1;
+      existing.total += item.totalPrice;
+      return acc;
+    }
+    acc.push({
+      key,
+      season: item.season,
+      nights: 1,
+      apartmentPrice: item.apartmentPrice,
+      studioPrice: item.studioPrice,
+      total: item.totalPrice
+    });
+    return acc;
+  }, []);
 
   const maxMinNights = pricing.breakdown.reduce(
     (max, item) => Math.max(max, item.minNights ?? 1),
@@ -64,6 +91,13 @@ export function PricePreview({
         {locale === "en" ? "Price breakdown" : "Preisaufschlüsselung"}
       </p>
       <div className="mt-2 space-y-1 text-xs">
+        {groupedBySeason.map((entry) => (
+          <p key={entry.key}>
+            {locale === "en"
+              ? `${entry.season}: ${entry.total.toFixed(0)}€ (${entry.nights} nights x ${(entry.apartmentPrice + entry.studioPrice).toFixed(0)}€)`
+              : `${entry.season}: ${entry.total.toFixed(0)}€ (${entry.nights} Nächte x ${(entry.apartmentPrice + entry.studioPrice).toFixed(0)}€)`}
+          </p>
+        ))}
         <p>
           {locale === "en"
             ? `Apartment: ${pricing.apartmentNightlyTotal.toFixed(0)}€ (${pricing.nights} nights)`

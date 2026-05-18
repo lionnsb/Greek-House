@@ -270,6 +270,7 @@ export async function sendInquiryReceivedEmail({
   endDate,
   reservationId,
   includesStudio,
+  shortNotice = false,
   language = "de"
 }: {
   to: string;
@@ -278,6 +279,7 @@ export async function sendInquiryReceivedEmail({
   endDate: string;
   reservationId: string;
   includesStudio: boolean;
+  shortNotice?: boolean;
   language?: "de" | "en";
 }) {
   const transport = createTransport();
@@ -288,12 +290,14 @@ export async function sendInquiryReceivedEmail({
         `thank you for your enquiry. We have received it and will get back to you shortly.\n` +
         `Dates: ${startDate} to ${endDate}\n` +
         `Studio: ${formatBool(includesStudio, "en")}\n` +
+        `${shortNotice ? "Attention: This is a short-notice request (less than 3 days before arrival).\n" : ""}` +
         `Reference: ${reservationId}\n\n` +
         `Best regards\nMati tis Thalassas`
       : `Hallo ${name},\n\n` +
         `danke für deine Anfrage. Wir haben sie erhalten und melden uns in Kürze.\n` +
         `Zeitraum: ${startDate} bis ${endDate}\n` +
         `Studio: ${formatBool(includesStudio, "de")}\n` +
+        `${shortNotice ? "Achtung: Dies ist eine kurzfristige Anfrage (weniger als 3 Tage vor Anreise).\n" : ""}` +
         `Referenz: ${reservationId}\n\n` +
         `Viele Grüße\nMati tis Thalassas`;
 
@@ -305,6 +309,7 @@ export async function sendInquiryReceivedEmail({
   <p>
     <strong>Dates:</strong> ${startDate} to ${endDate}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "en")}<br/>
+    ${shortNotice ? `<strong>Attention:</strong> This is a short-notice request (less than 3 days before arrival).<br/>` : ""}
     <strong>Reference:</strong> ${reservationId}
   </p>
   <p>Best regards<br/>Mati tis Thalassas</p>
@@ -315,6 +320,7 @@ export async function sendInquiryReceivedEmail({
   <p>
     <strong>Zeitraum:</strong> ${startDate} bis ${endDate}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "de")}<br/>
+    ${shortNotice ? `<strong>Achtung:</strong> Dies ist eine kurzfristige Anfrage (weniger als 3 Tage vor Anreise).<br/>` : ""}
     <strong>Referenz:</strong> ${reservationId}
   </p>
   <p>Viele Grüße<br/>Mati tis Thalassas</p>
@@ -414,6 +420,7 @@ export async function sendAdminNewInquiryEmail({
   endDate,
   includesStudio,
   message,
+  shortNotice = false,
   reservationId,
   language = "de"
 }: {
@@ -426,6 +433,7 @@ export async function sendAdminNewInquiryEmail({
   endDate: string;
   includesStudio: boolean;
   message?: string | null;
+  shortNotice?: boolean;
   reservationId: string;
   language?: "de" | "en";
 }) {
@@ -443,6 +451,7 @@ export async function sendAdminNewInquiryEmail({
         `Guests: ${guests}\n` +
         `Studio: ${formatBool(includesStudio, "en")}\n` +
         `Dates: ${startDate} to ${endDate}\n` +
+        `${shortNotice ? "Attention: Short-notice request (less than 3 days before arrival)\n" : ""}` +
         `Message: ${message ?? "-"}\n` +
         `Reservation: ${reservationId}\n`
       : `Neue Anfrage eingegangen\n\n` +
@@ -452,6 +461,7 @@ export async function sendAdminNewInquiryEmail({
         `Gäste: ${guests}\n` +
         `Studio: ${formatBool(includesStudio, "de")}\n` +
         `Zeitraum: ${startDate} bis ${endDate}\n` +
+        `${shortNotice ? "Achtung: Kurzfristige Anfrage (weniger als 3 Tage vor Anreise)\n" : ""}` +
         `Nachricht: ${message ?? "-"}\n` +
         `Reservierung: ${reservationId}\n`;
 
@@ -466,6 +476,7 @@ export async function sendAdminNewInquiryEmail({
     <strong>Guests:</strong> ${guests}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "en")}<br/>
     <strong>Dates:</strong> ${startDate} to ${endDate}<br/>
+    ${shortNotice ? `<strong>Attention:</strong> Short-notice request (less than 3 days before arrival)<br/>` : ""}
     <strong>Message:</strong> ${message ?? "-"}<br/>
     <strong>Reservation:</strong> ${reservationId}
   </p>
@@ -479,6 +490,7 @@ export async function sendAdminNewInquiryEmail({
     <strong>Gäste:</strong> ${guests}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "de")}<br/>
     <strong>Zeitraum:</strong> ${startDate} bis ${endDate}<br/>
+    ${shortNotice ? `<strong>Achtung:</strong> Kurzfristige Anfrage (weniger als 3 Tage vor Anreise)<br/>` : ""}
     <strong>Nachricht:</strong> ${message ?? "-"}<br/>
     <strong>Reservierung:</strong> ${reservationId}
   </p>

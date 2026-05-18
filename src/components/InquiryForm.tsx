@@ -10,7 +10,8 @@ import {
   hasShortNotice,
   isStudioRequired,
   isStudioSelectable,
-  MAX_GUESTS
+  MAX_GUESTS,
+  normalizeStudioSelection
 } from "@/lib/bookingRules";
 
 const defaultValues: InquiryPayload = {
@@ -43,6 +44,10 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
   const guestCount = Number(guests);
   const studioRequired = isStudioRequired(guestCount);
   const studioSelectable = isStudioSelectable(guestCount);
+  const effectiveIncludesStudio = normalizeStudioSelection(
+    guestCount,
+    Boolean(includesStudio)
+  );
   const shortNotice = startDate ? hasShortNotice(startDate) : false;
 
   useEffect(() => {
@@ -153,7 +158,7 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
           <PricePreview
             startDate={startDate ?? ""}
             endDate={endDate ?? ""}
-            includesStudio={Boolean(includesStudio)}
+            includesStudio={effectiveIncludesStudio}
             seasons={seasons}
             locale={locale}
           />
@@ -185,7 +190,9 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
       </label>
       <label className="flex items-center gap-2 text-sm text-ink/70">
         <input type="checkbox" className="h-4 w-4" {...register("acceptHouseRules", { required: true })} />
-        {locale === "en" ? "I accept the house rules." : "Ich akzeptiere die Hausregeln."}
+        {locale === "en"
+          ? "I accept the house rules for the apartment."
+          : "Ich akzeptiere die Hausregeln für das Apartment."}
       </label>
       <button type="submit" className="btn" disabled={status === "loading"}>
         {locale === "en" ? "Send request" : "Anfrage senden"}

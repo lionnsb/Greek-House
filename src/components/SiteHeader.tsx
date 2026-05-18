@@ -11,7 +11,7 @@ const copy = {
       { href: "/", label: "Start" },
       { href: "/haus", label: "Apartment" },
       { href: "/haus#studio", label: "Studio" },
-      { href: "/haus#hausregeln", label: "Hausregeln" },
+      { href: "/haus#apartmentregeln", label: "Apartmentregeln" },
       { href: "/verfuegbarkeit", label: "Verfügbarkeit" },
       { href: "/anreise", label: "Anreise" },
       { href: "/kontakt", label: "Kontakt" }
@@ -24,7 +24,7 @@ const copy = {
       { href: "/en", label: "Home" },
       { href: "/en/haus", label: "Apartment" },
       { href: "/en/haus#studio", label: "Studio" },
-      { href: "/en/haus#hausregeln", label: "House rules" },
+      { href: "/en/haus#apartment-rules", label: "Apartment rules" },
       { href: "/en/verfuegbarkeit", label: "Availability" },
       { href: "/en/anreise", label: "Arrival" },
       { href: "/en/kontakt", label: "Contact" }

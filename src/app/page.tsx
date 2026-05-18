@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ImageGrid } from "@/components/ImageGrid";
-import { homeGalleryImages } from "@/lib/imageSelection";
+import { homeGalleryImages, homeHeroImage } from "@/lib/imageSelection";
 
 const highlights = [
   "Nur ca. 50 m zum Meer und kleinem Strand",
@@ -37,7 +37,7 @@ export default function HomePage() {
           </div>
           <div className="overflow-hidden rounded-2xl border border-stone bg-stone/40">
             <img
-              src="/img/IMG_2806.JPG"
+              src={`/img/${homeHeroImage}`}
               alt="Pool und Meerblick des Apartmentbereichs"
               className="h-full w-full object-cover"
             />
