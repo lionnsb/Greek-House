@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 const copy = {
   de: {
     brand: "Mati tis Thalassas",
-    text: "Stilvoller Apartmentbereich in Kastraki, Naxos mit optionalem Studio. Anfrage & Buchung per E-Mail.",
+    text: "Villa mit stilvollem Erdgeschoss-Apartment in Kastraki auf Naxos. Das Apartment mit Pool und optionalem Studio liegt nur 50 Meter vom Meer entfernt.",
     contactLabel: "Kontakt",
     legal: [
       { href: "/impressum", label: "Impressum" },
@@ -15,7 +15,7 @@ const copy = {
   },
   en: {
     brand: "Mati tis Thalassas",
-    text: "Stylish apartment area in Kastraki, Naxos with optional studio. Enquiry & booking by email.",
+    text: "Villa with a stylish ground-floor apartment in Kastraki, Naxos. The apartment with pool and optional studio is only 50 metres from the sea.",
     contactLabel: "Contact",
     legal: [
       { href: "/en/impressum", label: "Imprint" },

@@ -3,12 +3,12 @@ import { ImageGrid } from "@/components/ImageGrid";
 import { homeGalleryImages, homeHeroImage } from "@/lib/imageSelection";
 
 const highlights = [
-  "About 50 m to the sea and a small beach",
-  "Large terrace with 30 m² pool",
+  "Only 50 metres to the sea and a small beach",
+  "Large outdoor area with lounge seating and sea view",
+  "30 m² pool with outdoor shower",
   "Outdoor kitchen with gas grill (plancha)",
-  "Two bedrooms + two bathrooms",
-  "Optional studio with own bathroom",
-  "Air conditioning & underfloor heating"
+  "Two bedrooms and two bathrooms across 80 m²",
+  "Separate studio with private bathroom available in addition"
 ];
 
 export default function HomePageEn() {
@@ -19,12 +19,13 @@ export default function HomePageEn() {
           <div>
             <p className="badge">Mati tis Thalassas · Kastraki, Naxos</p>
             <h1 className="mt-6 text-4xl font-semibold leading-tight">
-              Apartment area with pool, sea view and optional studio.
+              Exclusive ground-floor apartment with large terrace, 30 m² pool and separate studio.
             </h1>
             <p className="mt-4 text-base text-ink/70">
-              Exclusive ground-floor apartment with a large terrace, 30 m² pool
-              and outdoor kitchen. The apartment is part of a house that also
-              contains another privately used apartment area.
+              Villa Mati tis Thalassas in Kastraki consists of two apartments
+              and an atelier, set in a large garden. The apartment for rent is
+              only 50 metres from the sea; the upper floor and the atelier are
+              privately used.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/en/verfuegbarkeit" className="btn">

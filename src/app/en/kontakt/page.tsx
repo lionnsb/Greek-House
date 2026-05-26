@@ -5,8 +5,9 @@ export default function ContactPageEn() {
         <div>
           <h1 className="text-3xl font-semibold">Contact</h1>
           <p className="mt-4 text-sm text-ink/70">
-            You can reach us directly or via the enquiry form. We will get back
-            to you as soon as possible.
+            You can reach us directly by email or phone. We are happy to answer
+            questions about the apartment, the separate studio and the location
+            in Kastraki.
           </p>
           <div className="mt-6 grid gap-4 text-sm text-ink/70">
             <div className="card p-4">

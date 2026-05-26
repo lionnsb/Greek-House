@@ -5,8 +5,9 @@ export default function KontaktPage() {
         <div>
           <h1 className="text-3xl font-semibold">Kontakt</h1>
           <p className="mt-4 text-sm text-ink/70">
-            Du erreichst uns direkt oder über das Anfrageformular. Wir melden
-            uns schnellstmöglich zurück.
+            Du erreichst uns direkt per E-Mail oder Telefon. Gern beantworten
+            wir Fragen zum Apartment, zum separaten Studio und zur Lage in
+            Kastraki.
           </p>
           <div className="mt-6 grid gap-4 text-sm text-ink/70">
             <div className="card p-4">
@@ -26,7 +27,7 @@ export default function KontaktPage() {
         <div className="card p-6">
           <h2 className="text-lg font-semibold">Direkte Anfrage</h2>
           <p className="mt-2 text-sm text-ink/70">
-            Für Verfügbarkeiten und Buchungen nutzen wir das Anfrageformular
+            Für Verfügbarkeiten und Buchungen nutze bitte das Anfrageformular
             über den Kalender.
           </p>
           <div className="mt-4">

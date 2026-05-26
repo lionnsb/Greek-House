@@ -4,37 +4,57 @@ import { ImageGrid } from "@/components/ImageGrid";
 import { houseTopImages, houseGalleryImages } from "@/lib/imageSelection";
 
 const houseHighlights = [
-  "Exklusives Apartment im Erdgeschoss (80 m²)",
-  "Große Terrasse mit 30 m² Pool",
-  "Außenküche mit Gasgrill (Plancher)",
-  "Zwei Schlafzimmer & zwei Badezimmer",
-  "Integriertes Studio mit eigenem Bad (optional)"
+  "Exklusives Erdgeschoss-Apartment mit 80 m² Wohnfläche",
+  "Große Terrasse mit 30 m² Pool und Außendusche",
+  "Außenküche mit Gasgrill (Plancha)",
+  "Zwei Schlafzimmer und zwei Badezimmer",
+  "Separates Studio mit eigenem Bad zusätzlich buchbar"
 ];
 
 const studioHighlights = [
-  "Separates Studio (ca. 10 m²) mit eigenem Bad",
-  "Zugang über die Terrasse",
+  "Ca. 10 m² großes Studio mit eigenem Bad",
+  "Separater Zugang über die Terrasse",
   "Doppelbett 140 x 200",
-  "Klimaanlage & Standventilator",
-  "Nur zusammen mit dem Apartmentbereich buchbar"
+  "Klimaanlage und Standventilator",
+  "Zusätzlicher Stauraum hinter großen Schranktüren"
 ];
 
 const rooms = [
-  { title: "Kochen, Essen, Wohnen", description: "Voll ausgestattete Küche mit Backofen, Spülmaschine und Waschmaschine. Innen- und Außenküche mit Gasgrill (Plancher)." },
-  { title: "Master-Schlafzimmer", description: "Doppelbett 160 x 200, offener Kleiderschrank, Safe. Duschbad über den Flur erreichbar." },
-  { title: "Zweites Schlafzimmer", description: "Doppelbett 160 x 200 + Stockbett 90 x 200, Ensuite-Bad und eigene Terrasse mit Meerblick." },
-  { title: "Bäder", description: "Alle Bäder mit Regendusche, Handbrause, Waschtisch und Popodusche." },
-  { title: "Terrasse & Außenbereich", description: "Großer Außenbereich mit Sitzlounge, Außendusche und Meerblick." },
-  { title: "Pool", description: "30 m² Pool direkt an der Terrasse." }
+  {
+    title: "Kochen, Essen, Wohnen",
+    description:
+      "Komplett ausgestattete Küche mit Nespresso-Maschine, Wasserkocher, Toaster, Geschirr und Kochutensilien. Dazu kommen Induktionsherd, Kühl-/Gefrierkombination, Backofen, Spülmaschine, Waschmaschine und eine Außenküche mit Gasgrill."
+  },
+  {
+    title: "Master-Schlafzimmer",
+    description:
+      "Zur Terrasse ausgerichtetes Schlafzimmer mit Doppelbett 160 x 200, offenem Einbauschrank, zusätzlichen Ablagen und programmierbarem Safe. Das zugehörige Duschbad liegt gegenüber auf der Flurseite."
+  },
+  {
+    title: "Zweites Schlafzimmer",
+    description:
+      "Doppelbett 160 x 200 und Stockbett 90 x 200, offener Kleiderschrank im kykladischen Stil und zusätzlicher Stauraum. Dazu ein Ensuite-Bad und eine eigene Terrasse mit Meerblick. Das Stockbett ist bei Kindern und Jugendlichen besonders beliebt."
+  },
+  {
+    title: "Bäder",
+    description:
+      "Alle Badezimmer haben eine Toilette mit Bidet-Dusche, eine Regendusche mit Handbrause und einen Waschtisch mit Handseife. Für persönliche Kosmetika steht pro Gast ein Korb bereit."
+  },
+  {
+    title: "Terrasse & Außenbereich",
+    description:
+      "Großer Außenbereich mit gemütlicher Sitzecke, Meerblick, Außendusche und direktem Zugang zum Pool sowie zum Studio."
+  },
+  { title: "Pool", description: "30 m² großer Pool direkt an der Terrasse." }
 ];
 
 const amenities = [
-  "Klimaanlage und Ventilatoren in Wohn- und Schlafbereichen",
-  "Fußbodenheizung im Haupthaus für kühle Tage",
-  "Trinkwasserfilter (separater Hahn in der Spüle)",
-  "Wäschebereich mit Waschmaschine, Waschmittel, Wäschekörben",
-  "Handtücher: pro Gast 1 Hand-, 1 Dusch- und 1 Strandtuch",
-  "Safe im Master-Schlafzimmer"
+  "Klimaanlage und Ventilatoren in Wohnzimmer, Schlafzimmern und Studio",
+  "Fußbodenheizung im Haupthaus für kalte Tage",
+  "Trinkwasser über separaten Hahn mit Filteranlage",
+  "Pro Gast liegen ein Handtuch, ein Duschtuch und ein Strandtuch bereit",
+  "Wäscheschrank mit Waschmaschine, Waschmitteln, Körben, Wäscheständer und Klammern",
+  "Programmierbarer Safe im Hauptschlafzimmer"
 ];
 
 export default function HausPage() {
@@ -46,9 +66,10 @@ export default function HausPage() {
             <p className="badge">Mati tis Thalassas</p>
             <h1 className="mt-4 text-3xl font-semibold">Das Apartment</h1>
             <p className="mt-4 text-base text-ink/70">
-              Unser Apartmentbereich in Kastraki auf Naxos bietet Platz für
-              Familien und Gruppen. Das Apartment befindet sich in einem Haus,
-              in dem ein weiterer Bereich privat genutzt wird.
+              Die Villa Mati tis Thalassas in Kastraki besteht aus zwei
+              Apartments und einem Atelier, eingebettet in einen großen Garten.
+              Das zu vermietende Apartment im Erdgeschoss bietet viel
+              Privatsphäre; Obergeschoss und Atelier werden privat genutzt.
             </p>
             <ul className="mt-6 grid gap-3 text-sm text-ink/70">
               {houseHighlights.map((item) => (
@@ -72,8 +93,8 @@ export default function HausPage() {
         <div className="container">
           <h2 className="text-2xl font-semibold">Räume & Ausstattung</h2>
           <p className="mt-3 text-sm text-ink/70">
-            Das Apartment bietet großzügige Innenräume und einen großen Außenbereich.
-            Bilder kannst du später in die Platzhalter einsetzen.
+            Großzügige Innenräume, viel Stauraum und ein Außenbereich, der das
+            Wohnen bis ans Meer verlängert.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map((room) => (
@@ -103,17 +124,23 @@ export default function HausPage() {
       <section className="section">
         <div className="container grid gap-8 lg:grid-cols-2 lg:items-center">
           <div>
-            <h2 id="studio" className="text-2xl font-semibold scroll-mt-24">Studio (optional, integriert)</h2>
+            <h2 id="studio" className="text-2xl font-semibold scroll-mt-24">Studio (optional, separat)</h2>
             <p className="mt-4 text-sm text-ink/70">
-              Das Studio ist in den Apartmentbereich integriert und kann nur
-              zusammen mit dem Apartment gebucht werden. Ideal für zusätzliche
-              Privatsphäre.
+              Das ca. 10 m² große Studio kann zusätzlich zum Apartment
+              angemietet werden. Es liegt separat, wird über die Terrasse durch
+              eine große abschließbare Fenster-Schiebetür erreicht und verfügt
+              über ein eigenes Badezimmer.
             </p>
             <ul className="mt-4 grid gap-3 text-sm text-ink/70">
               {studioHighlights.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
+            <p className="mt-4 text-sm text-ink/70">
+              Das Studio schafft zusätzlichen Platz für größere Familien,
+              Patchwork-Konstellationen, Großeltern oder mitreisende
+              Betreuungspersonen.
+            </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <PlaceholderImage label="Studio Außen" />
@@ -129,16 +156,24 @@ export default function HausPage() {
           <div>
             <h2 className="text-2xl font-semibold">Lage & Umgebung</h2>
             <p className="mt-4 text-sm text-ink/70">
-              Der Apartmentbereich liegt in Kastraki – nur ca. 50 Meter vom Meer und einem
-              kleinen Strand entfernt. Nach rechts erreichst du nach ca. 250 m
-              den 2 km langen Sahara Beach, nach links nach ca. 350 m den 3 km
-              langen Glyfada Beach. Beide Strände sind auch in der Hauptsaison
-              angenehm ruhig.
+              Die Villa Mati tis Thalassas liegt in Kastraki nur 50 Meter vom
+              Meer und einem kleinen Strand entfernt. Nach rechts gelangst du
+              nach ca. 250 m zum 2 km langen Sahara Beach, nach links nach ca.
+              350 m zum 3 km langen Glyfada Beach. Beide Strände sind auch in
+              der Hauptsaison nicht überfüllt.
             </p>
             <p className="mt-4 text-sm text-ink/70">
-              Von Mai bis Mitte Oktober sind Restaurants und eine Bar zu Fuß
-              erreichbar. In der Umgebung gibt es Supermärkte und Bäckereien.
-              Kitesurfen ist in Mikri Viglia (ca. 2 km) möglich.
+              An beiden Stränden gibt es verschiedene Sportangebote; der
+              Kite-Strand in Mikri Viglia ist nur etwa 2 km entfernt. Von Mai
+              bis Mitte Oktober sind mehrere (Strand-)Restaurants und eine Bar
+              fußläufig erreichbar. Für die Versorgung gibt es vier
+              Supermärkte und zwei Bäckereien in der Umgebung.
+            </p>
+            <p className="mt-4 text-sm text-ink/70">
+              Naxos bietet eine wunderschöne Altstadt, einen schönen Hafen mit
+              vielen Restaurants und Bars, historische Sehenswürdigkeiten und
+              schöne Wanderwege. Die Insel ist außerdem beliebt bei Wind- und
+              Kitesurfern.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

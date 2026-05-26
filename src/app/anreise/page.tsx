@@ -5,15 +5,16 @@ export default function AnreisePage() {
         <div>
           <h1 className="text-3xl font-semibold">Anreise</h1>
           <p className="mt-4 text-sm text-ink/70">
-            Hier findest du die wichtigsten Informationen zur Lage, Anfahrt und
-            Check-in/Check-out.
+            Hier findest du die wichtigsten Informationen zur Lage des
+            Apartments und zu den Stränden in der direkten Umgebung.
           </p>
           <div className="mt-6 grid gap-4 text-sm text-ink/70">
             <div className="card p-4">
               <p className="font-semibold text-ink">Lage</p>
               <p className="mt-2">
-                Kastraki, Naxos – nur ca. 50 m vom Meer entfernt. Adresse und
-                Kartenlink ergänzen wir gern.
+                Die Villa Mati tis Thalassas liegt in Kastraki nur etwa 50 m
+                vom Meer und einem kleinen Strand entfernt. Das zu vermietende
+                Apartment befindet sich im Erdgeschoss.
               </p>
             </div>
             <div className="card p-4">
@@ -27,15 +28,16 @@ export default function AnreisePage() {
             <div className="card p-4">
               <p className="font-semibold text-ink">Strände in der Nähe</p>
               <p className="mt-2">
-                Sahara Beach ca. 250 m, Glyfada Beach ca. 350 m. Beide sind auch
-                in der Hochsaison angenehm ruhig.
+                Sahara Beach ca. 250 m, Glyfada Beach ca. 350 m. Beide Strände
+                sind auch in der Hauptsaison nicht überfüllt.
               </p>
             </div>
             <div className="card p-4">
               <p className="font-semibold text-ink">Versorgung</p>
               <p className="mt-2">
-                Von Mai bis Mitte Oktober Restaurants und eine Bar fußläufig.
-                Supermärkte und Bäckereien in der Umgebung.
+                Von Mai bis Mitte Oktober sind mehrere (Strand-)Restaurants und
+                eine Bar fußläufig erreichbar. Für die Versorgung gibt es vier
+                Supermärkte und zwei Bäckereien in der Umgebung.
               </p>
             </div>
           </div>
