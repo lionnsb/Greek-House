@@ -1,5 +1,5 @@
 import { differenceInCalendarDays, parseISO } from "date-fns";
-import { APARTMENT_CLEANING_FEE, STUDIO_CLEANING_FEE } from "@/lib/bookingRules";
+import { APARTMENT_CLEANING_FEE, STUDIO_CLEANING_FEE } from "./bookingRules";
 
 export function nightsBetween(startDate: string, endDate: string) {
   const start = parseISO(startDate);

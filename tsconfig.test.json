@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": ".test-dist",
+    "incremental": false
+  },
+  "include": [
+    "src/lib/bookingRules.ts",
+    "src/lib/pricing.ts",
+    "src/lib/seasonPricing.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

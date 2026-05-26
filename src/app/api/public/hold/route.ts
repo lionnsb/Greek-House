@@ -8,7 +8,7 @@ import {
   reservationBlocksUntil
 } from "@/lib/bookingRules";
 import type { InquiryPayload } from "@/lib/types";
-import { buildSeasonsFromEnv, calculateSeasonalTotal } from "@/lib/seasonPricing";
+import { buildSeasonCatalog, calculateSeasonalTotal } from "@/lib/seasonPricing";
 
 function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
   return aStart < bEnd && bStart < aEnd;
@@ -66,10 +66,11 @@ export async function POST(request: Request) {
         pricePerNight: data.price_per_night,
         studioSurchargePerNight: data.studio_surcharge_per_night,
         minNights: data.min_nights ?? 1,
-        createdAt: data.created_at
+        createdAt: data.created_at,
+        source: "admin" as const
       };
     });
-    const seasonList = seasons.length ? seasons : buildSeasonsFromEnv();
+    const seasonList = buildSeasonCatalog(seasons);
     const reservationsSnap = await adminDb
       .collection("reservations")
       .where("status", "in", ["HOLD", "ACCEPTED_AWAITING_PAYMENT", "CONFIRMED"])

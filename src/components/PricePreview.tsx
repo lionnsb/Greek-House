@@ -92,8 +92,13 @@ export function PricePreview({
 
   return (
     <div className="text-sm text-ink/70">
-      <p>
+      <p className="font-medium text-ink">
         {locale === "en" ? "Price breakdown" : "Preisaufschlüsselung"}
+      </p>
+      <p className="mt-1 text-xs text-ink/60">
+        {locale === "en"
+          ? "Total includes the apartment cleaning fee and, if selected, the studio cleaning fee."
+          : "Der Gesamtpreis enthält die Reinigungsgebühr für das Apartment und, falls gewählt, für das Studio."}
       </p>
       <div className="mt-2 space-y-1 text-xs">
         {groupedBySeason.map((entry, index) => (

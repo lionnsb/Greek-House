@@ -9,7 +9,11 @@ import {
   MAX_GUESTS,
   normalizeStudioSelection
 } from "@/lib/bookingRules";
-import { buildSeasonsFromEnv, calculateSeasonalTotal } from "@/lib/seasonPricing";
+import {
+  buildSeasonCatalog,
+  buildSeasonsFromEnv,
+  calculateSeasonalTotal
+} from "@/lib/seasonPricing";
 import type { SeasonDefinition } from "@/lib/seasonPricing";
 
 type ActionState = {
@@ -42,7 +46,7 @@ export default function AdminAnfragenPage() {
   const [query, setQuery] = useState("");
   const [editing, setEditing] = useState<Record<string, boolean>>({});
 
-  const [seasons, setSeasons] = useState<SeasonDefinition[]>(buildSeasonsFromEnv());
+  const [seasons, setSeasons] = useState<SeasonDefinition[]>(buildSeasonCatalog([]));
 
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
@@ -101,21 +105,22 @@ export default function AdminAnfragenPage() {
       try {
         const response = await adminFetch("/api/admin/seasons");
         const data = await response.json();
-        if (data?.items?.length) {
-          setSeasons(
-            data.items.map((item: { name: string; startDate: string; endDate: string; pricePerNight: number; studioSurchargePerNight: number; minNights: number; createdAt?: string }) => ({
+        setSeasons(
+          buildSeasonCatalog(
+            (data?.items ?? []).map((item: { name: string; startDate: string; endDate: string; pricePerNight: number; studioSurchargePerNight: number; minNights: number; createdAt?: string }) => ({
               name: item.name,
               start: item.startDate,
               end: item.endDate,
               pricePerNight: item.pricePerNight,
               studioSurchargePerNight: item.studioSurchargePerNight,
               minNights: item.minNights ?? 1,
-              createdAt: item.createdAt
+              createdAt: item.createdAt,
+              source: "admin" as const
             }))
-          );
-        }
+          )
+        );
       } catch {
-        // fallback to env
+        setSeasons(buildSeasonsFromEnv());
       }
     }
     loadSeasons();

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { addDays, format, parseISO } from "date-fns";
 import { reservationBlocksUntil } from "@/lib/bookingRules";
 import { dateKeysBetween } from "@/lib/date";
-import { buildSeasonsFromEnv } from "@/lib/seasonPricing";
+import { buildSeasonCatalog } from "@/lib/seasonPricing";
 
 export const dynamic = "force-dynamic";
 
@@ -29,14 +29,15 @@ export async function GET() {
         pricePerNight: data.price_per_night,
         studioSurchargePerNight: data.studio_surcharge_per_night,
         minNights: data.min_nights ?? 1,
-        createdAt: data.created_at
+        createdAt: data.created_at,
+        source: "admin" as const
       };
     });
 
     const dayStatus: Record<string, "BLOCKED" | "HOLD" | "CONFIRMED"> = {};
     const now = new Date().toISOString();
     const todayKey = format(new Date(), "yyyy-MM-dd");
-    const seasonList = seasons.length ? seasons : buildSeasonsFromEnv();
+    const seasonList = buildSeasonCatalog(seasons);
 
     function applyStatus(key: string, status: "BLOCKED" | "HOLD" | "CONFIRMED") {
       const current = dayStatus[key];
@@ -76,6 +77,6 @@ export async function GET() {
     return NextResponse.json({ dayStatus, seasons: seasonList });
   } catch (error) {
     console.error("GET /api/public/availability failed", error);
-    return NextResponse.json({ dayStatus: {}, seasons: buildSeasonsFromEnv() });
+    return NextResponse.json({ dayStatus: {}, seasons: buildSeasonCatalog([]) });
   }
 }

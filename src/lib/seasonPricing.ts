@@ -2,8 +2,13 @@ import { addDays, differenceInCalendarDays, format, parseISO } from "date-fns";
 import {
   APARTMENT_CLEANING_FEE,
   STUDIO_CLEANING_FEE
-} from "@/lib/bookingRules";
-import { nightsBetween } from "@/lib/pricing";
+} from "./bookingRules";
+import { nightsBetween } from "./pricing";
+
+export type SeasonSource = "admin" | "env" | "fallback";
+
+const FALLBACK_STANDARD_START = "1900-01-01";
+const FALLBACK_STANDARD_END = "3000-01-01";
 
 export type SeasonDefinition = {
   name: string;
@@ -13,18 +18,11 @@ export type SeasonDefinition = {
   studioSurchargePerNight: number;
   minNights: number;
   createdAt?: string;
+  source?: SeasonSource;
 };
 
-function normalizeSeasonName(name: string) {
-  return name.trim().toLowerCase();
-}
-
 function isFallbackStandardSeason(season: SeasonDefinition) {
-  return (
-    normalizeSeasonName(season.name) === "standard" &&
-    season.start === "1900-01-01" &&
-    season.end === "3000-01-01"
-  );
+  return season.source === "fallback";
 }
 
 function seasonSpanDays(season: SeasonDefinition) {
@@ -34,31 +32,27 @@ function seasonSpanDays(season: SeasonDefinition) {
   );
 }
 
-function sortSeasonCandidates(seasons: SeasonDefinition[]) {
-  return [...seasons].sort((a, b) => {
-    if (isFallbackStandardSeason(a) !== isFallbackStandardSeason(b)) {
-      return isFallbackStandardSeason(a) ? 1 : -1;
-    }
-    const spanDelta = seasonSpanDays(a) - seasonSpanDays(b);
-    if (spanDelta !== 0) return spanDelta;
-    const createdAtA = a.createdAt ?? "";
-    const createdAtB = b.createdAt ?? "";
-    if (createdAtA !== createdAtB) return createdAtA < createdAtB ? 1 : -1;
-    if (a.start === b.start) return 0;
-    return a.start < b.start ? 1 : -1;
-  });
-}
-
 function isDateInsideSeason(date: string, season: SeasonDefinition) {
   return date >= season.start && date <= season.end;
 }
 
-export function buildSeasonsFromEnv(): SeasonDefinition[] {
+function compareSeasonCandidates(a: SeasonDefinition, b: SeasonDefinition) {
+  const createdAtA = a.createdAt ?? "";
+  const createdAtB = b.createdAt ?? "";
+  if (createdAtA !== createdAtB) return createdAtA < createdAtB ? 1 : -1;
+
+  const spanDelta = seasonSpanDays(a) - seasonSpanDays(b);
+  if (spanDelta !== 0) return spanDelta;
+
+  if (a.start === b.start) return 0;
+  return a.start < b.start ? 1 : -1;
+}
+
+function baseSeasonValuesFromEnv() {
   const summerStart = process.env.NEXT_PUBLIC_SUMMER_START ?? "";
   const summerEnd = process.env.NEXT_PUBLIC_SUMMER_END ?? "";
   const winterStart = process.env.NEXT_PUBLIC_WINTER_START ?? "";
   const winterEnd = process.env.NEXT_PUBLIC_WINTER_END ?? "";
-
   const summerPrice = Number(process.env.NEXT_PUBLIC_SUMMER_PRICE_PER_NIGHT ?? "0");
   const summerStudio = Number(
     process.env.NEXT_PUBLIC_SUMMER_STUDIO_SURCHARGE_PER_NIGHT ?? "0"
@@ -72,45 +66,93 @@ export function buildSeasonsFromEnv(): SeasonDefinition[] {
     process.env.NEXT_PUBLIC_STUDIO_SURCHARGE_PER_NIGHT ?? "0"
   );
 
+  return {
+    summerStart,
+    summerEnd,
+    winterStart,
+    winterEnd,
+    summerPrice,
+    summerStudio,
+    winterPrice,
+    winterStudio,
+    standardPrice,
+    standardStudio
+  };
+}
+
+export function buildStandardFallbackSeason(): SeasonDefinition {
+  const values = baseSeasonValuesFromEnv();
+
+  return {
+    name: "Standard",
+    start: FALLBACK_STANDARD_START,
+    end: FALLBACK_STANDARD_END,
+    pricePerNight: values.standardPrice,
+    studioSurchargePerNight: values.standardStudio,
+    minNights: Number(process.env.NEXT_PUBLIC_STANDARD_MIN_NIGHTS ?? "1"),
+    source: "fallback"
+  };
+}
+
+export function buildSeasonsFromEnv(): SeasonDefinition[] {
+  const values = baseSeasonValuesFromEnv();
+
   const seasons: SeasonDefinition[] = [];
-  if (summerStart && summerEnd) {
+  if (values.summerStart && values.summerEnd) {
     seasons.push({
       name: "Hauptsaison",
-      start: summerStart,
-      end: summerEnd,
-      pricePerNight: summerPrice || standardPrice,
-      studioSurchargePerNight: summerStudio || standardStudio,
-      minNights: Number(process.env.NEXT_PUBLIC_SUMMER_MIN_NIGHTS ?? "1")
+      start: values.summerStart,
+      end: values.summerEnd,
+      pricePerNight: values.summerPrice || values.standardPrice,
+      studioSurchargePerNight: values.summerStudio || values.standardStudio,
+      minNights: Number(process.env.NEXT_PUBLIC_SUMMER_MIN_NIGHTS ?? "1"),
+      source: "env"
     });
   }
-  if (winterStart && winterEnd) {
+  if (values.winterStart && values.winterEnd) {
     seasons.push({
       name: "Winter",
-      start: winterStart,
-      end: winterEnd,
-      pricePerNight: winterPrice || standardPrice,
-      studioSurchargePerNight: winterStudio || standardStudio,
-      minNights: Number(process.env.NEXT_PUBLIC_WINTER_MIN_NIGHTS ?? "1")
+      start: values.winterStart,
+      end: values.winterEnd,
+      pricePerNight: values.winterPrice || values.standardPrice,
+      studioSurchargePerNight: values.winterStudio || values.standardStudio,
+      minNights: Number(process.env.NEXT_PUBLIC_WINTER_MIN_NIGHTS ?? "1"),
+      source: "env"
     });
   }
   seasons.push({
     name: "Standard",
-    start: "1900-01-01",
-    end: "3000-01-01",
-    pricePerNight: standardPrice,
-    studioSurchargePerNight: standardStudio,
-    minNights: Number(process.env.NEXT_PUBLIC_STANDARD_MIN_NIGHTS ?? "1")
+    start: FALLBACK_STANDARD_START,
+    end: FALLBACK_STANDARD_END,
+    pricePerNight: values.standardPrice,
+    studioSurchargePerNight: values.standardStudio,
+    minNights: Number(process.env.NEXT_PUBLIC_STANDARD_MIN_NIGHTS ?? "1"),
+    source: "env"
   });
 
   return seasons;
 }
 
+export function buildSeasonCatalog(adminSeasons: SeasonDefinition[]) {
+  if (!adminSeasons.length) {
+    return buildSeasonsFromEnv();
+  }
+
+  return [
+    ...adminSeasons.map((season) => ({
+      ...season,
+      source: season.source ?? "admin"
+    })),
+    buildStandardFallbackSeason()
+  ];
+}
+
 export function seasonForDate(date: string, seasons: SeasonDefinition[]) {
-  const matched = sortSeasonCandidates(seasons).find((season) =>
-    isDateInsideSeason(date, season)
-  );
-  if (matched) return matched;
-  return seasons.find((item) => normalizeSeasonName(item.name) === "standard") ?? null;
+  const matched = seasons.filter((season) => isDateInsideSeason(date, season));
+  const specificMatches = matched.filter((season) => !isFallbackStandardSeason(season));
+  const candidates = specificMatches.length ? specificMatches : matched;
+
+  return [...candidates].sort(compareSeasonCandidates)[0] ?? null;
 }
 
 export function calculateSeasonalTotal({
