@@ -9,6 +9,7 @@
     "src/lib/bookingRules.ts",
     "src/lib/pricing.ts",
     "src/lib/seasonPricing.ts",
+    "src/lib/seasonStore.ts",
     "tests/**/*.ts"
   ],
   "exclude": [

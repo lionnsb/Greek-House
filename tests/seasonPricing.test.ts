@@ -7,6 +7,7 @@ import {
   seasonForDate,
   type SeasonDefinition
 } from "../src/lib/seasonPricing.js";
+import { mapDbSeasons } from "../src/lib/seasonStore.js";
 
 const originalEnv = { ...process.env };
 
@@ -159,6 +160,47 @@ describe("seasonPricing", () => {
     );
     assert.equal(pricing.apartmentNightlyTotal, 470);
     assert.equal(pricing.total, 620);
+  });
+
+  it("uses an admin standard price without dates as the always-on base price", () => {
+    setStandardFallback(90, 20);
+
+    const pricing = calculateSeasonalTotal({
+      startDate: "2026-04-03",
+      endDate: "2026-04-08",
+      includesStudio: false,
+      seasons: buildSeasonCatalog(
+        mapDbSeasons([
+          {
+            id: "standard-admin",
+            name: "Standard",
+            startDate: null,
+            endDate: null,
+            pricePerNight: 120,
+            studioSurchargePerNight: 35,
+            minNights: 1,
+            createdAt: "2026-03-01T00:00:00.000Z"
+          },
+          {
+            id: "high-season",
+            name: "Hauptsaison",
+            startDate: "2026-04-05",
+            endDate: "2026-04-08",
+            pricePerNight: 200,
+            studioSurchargePerNight: 60,
+            minNights: 1,
+            createdAt: "2026-03-02T00:00:00.000Z"
+          }
+        ])
+      )
+    });
+
+    assert.deepEqual(
+      pricing.breakdown.map((item) => item.apartmentPrice),
+      [120, 120, 200, 200, 200]
+    );
+    assert.equal(pricing.apartmentNightlyTotal, 840);
+    assert.equal(pricing.total, 990);
   });
 
   it("lets the newest admin season win on overlapping dates", () => {

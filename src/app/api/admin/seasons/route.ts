@@ -43,8 +43,12 @@ export async function POST(request: Request) {
   const pricePerNight = Number(payload.pricePerNight ?? 0);
   const studioSurchargePerNight = Number(payload.studioSurchargePerNight ?? 0);
   const minNights = Number(payload.minNights ?? 1);
+  const isStandard = name === "Standard";
 
-  if (!name || !startDate || !endDate || startDate > endDate) {
+  if (
+    !name ||
+    (!isStandard && (!startDate || !endDate || startDate > endDate))
+  ) {
     return NextResponse.json(
       { message: "Ungültige Saison-Daten." },
       { status: 400 }
@@ -53,8 +57,8 @@ export async function POST(request: Request) {
 
   const docRef = await adminDb.collection("pricing_seasons").add({
     name,
-    start_date: startDate,
-    end_date: endDate,
+    start_date: isStandard ? null : startDate,
+    end_date: isStandard ? null : endDate,
     price_per_night: pricePerNight,
     studio_surcharge_per_night: studioSurchargePerNight,
     min_nights: minNights,

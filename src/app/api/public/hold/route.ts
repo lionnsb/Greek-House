@@ -9,6 +9,7 @@ import {
 } from "@/lib/bookingRules";
 import type { InquiryPayload } from "@/lib/types";
 import { buildSeasonCatalog, calculateSeasonalTotal } from "@/lib/seasonPricing";
+import { mapDbSeasons } from "@/lib/seasonStore";
 
 function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
   return aStart < bEnd && bStart < aEnd;
@@ -57,19 +58,21 @@ export async function POST(request: Request) {
 
     const blocksSnap = await adminDb.collection("availability_blocks").get();
     const seasonsSnap = await adminDb.collection("pricing_seasons").get();
-    const seasons = seasonsSnap.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        name: data.name,
-        start: data.start_date,
-        end: data.end_date,
-        pricePerNight: data.price_per_night,
-        studioSurchargePerNight: data.studio_surcharge_per_night,
-        minNights: data.min_nights ?? 1,
-        createdAt: data.created_at,
-        source: "admin" as const
-      };
-    });
+    const seasons = mapDbSeasons(
+      seasonsSnap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name,
+          startDate: data.start_date ?? null,
+          endDate: data.end_date ?? null,
+          pricePerNight: data.price_per_night,
+          studioSurchargePerNight: data.studio_surcharge_per_night,
+          minNights: data.min_nights ?? 1,
+          createdAt: data.created_at
+        };
+      })
+    );
     const seasonList = buildSeasonCatalog(seasons);
     const reservationsSnap = await adminDb
       .collection("reservations")

@@ -5,10 +5,10 @@ import {
 } from "./bookingRules";
 import { nightsBetween } from "./pricing";
 
-export type SeasonSource = "admin" | "env" | "fallback";
+export type SeasonSource = "admin" | "env" | "fallback" | "baseline";
 
-const FALLBACK_STANDARD_START = "1900-01-01";
-const FALLBACK_STANDARD_END = "3000-01-01";
+export const FALLBACK_STANDARD_START = "1900-01-01";
+export const FALLBACK_STANDARD_END = "3000-01-01";
 
 export type SeasonDefinition = {
   name: string;
@@ -23,6 +23,10 @@ export type SeasonDefinition = {
 
 function isFallbackStandardSeason(season: SeasonDefinition) {
   return season.source === "fallback";
+}
+
+function isBaselineStandardSeason(season: SeasonDefinition) {
+  return season.source === "baseline";
 }
 
 function seasonSpanDays(season: SeasonDefinition) {
@@ -149,10 +153,21 @@ export function buildSeasonCatalog(adminSeasons: SeasonDefinition[]) {
 
 export function seasonForDate(date: string, seasons: SeasonDefinition[]) {
   const matched = seasons.filter((season) => isDateInsideSeason(date, season));
-  const specificMatches = matched.filter((season) => !isFallbackStandardSeason(season));
-  const candidates = specificMatches.length ? specificMatches : matched;
+  const specificMatches = matched.filter(
+    (season) =>
+      !isFallbackStandardSeason(season) &&
+      !isBaselineStandardSeason(season)
+  );
+  if (specificMatches.length) {
+    return [...specificMatches].sort(compareSeasonCandidates)[0] ?? null;
+  }
 
-  return [...candidates].sort(compareSeasonCandidates)[0] ?? null;
+  const baselineMatches = matched.filter((season) => isBaselineStandardSeason(season));
+  if (baselineMatches.length) {
+    return [...baselineMatches].sort(compareSeasonCandidates)[0] ?? null;
+  }
+
+  return [...matched].sort(compareSeasonCandidates)[0] ?? null;
 }
 
 export function calculateSeasonalTotal({

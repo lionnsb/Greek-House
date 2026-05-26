@@ -10,6 +10,9 @@ export default function AdminPreisePage() {
     "idle" | "loading" | "success" | "error"
   >("idle");
   const [seasonError, setSeasonError] = useState<string | null>(null);
+  const [selectedSeasonName, setSelectedSeasonName] = useState("Hauptsaison");
+
+  const isStandardSeason = selectedSeasonName === "Standard";
 
   useEffect(() => {
     async function loadSeasons() {
@@ -54,8 +57,8 @@ export default function AdminPreisePage() {
         {
           id: data.id,
           name: String(payload.name),
-          startDate: String(payload.startDate),
-          endDate: String(payload.endDate),
+          startDate: isStandardSeason ? null : String(payload.startDate),
+          endDate: isStandardSeason ? null : String(payload.endDate),
           pricePerNight: Number(payload.pricePerNight ?? 0),
           studioSurchargePerNight: Number(payload.studioSurchargePerNight ?? 0),
           minNights: Number(payload.minNights ?? 1),
@@ -63,6 +66,7 @@ export default function AdminPreisePage() {
         }
       ]);
       event.currentTarget.reset();
+      setSelectedSeasonName("Hauptsaison");
       setSeasonStatus("success");
     } catch (err) {
       setSeasonStatus("error");
@@ -97,7 +101,13 @@ export default function AdminPreisePage() {
           <h2 className="text-lg font-semibold">Saison anlegen</h2>
           <div>
             <label className="label">Saison</label>
-            <select name="name" className="input" required>
+            <select
+              name="name"
+              className="input"
+              required
+              value={selectedSeasonName}
+              onChange={(event) => setSelectedSeasonName(event.target.value)}
+            >
               <option value="Hauptsaison">Hauptsaison</option>
               <option value="Vorsaison">Vorsaison</option>
               <option value="Nachsaison">Nachsaison</option>
@@ -108,12 +118,28 @@ export default function AdminPreisePage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="label">Startdatum</label>
-              <input name="startDate" type="date" className="input" required />
+              <input
+                name="startDate"
+                type="date"
+                className="input"
+                required={!isStandardSeason}
+                disabled={isStandardSeason}
+              />
             </div>
             <div>
               <label className="label">Enddatum</label>
-              <input name="endDate" type="date" className="input" required />
-              <p className="mt-1 text-xs text-ink/60">Enddatum wird inklusive gerechnet.</p>
+              <input
+                name="endDate"
+                type="date"
+                className="input"
+                required={!isStandardSeason}
+                disabled={isStandardSeason}
+              />
+              <p className="mt-1 text-xs text-ink/60">
+                {isStandardSeason
+                  ? "Beim Standardpreis ist kein Zeitraum noetig. Er gilt immer, ausser eine datumsgebundene Saison ueberschreibt ihn."
+                  : "Enddatum wird inklusive gerechnet."}
+              </p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
@@ -169,7 +195,10 @@ export default function AdminPreisePage() {
             {seasons.map((item) => (
               <div key={item.id} className="card p-4 text-sm text-ink/70">
                 <p className="font-semibold text-ink">
-                  {item.name}: {item.startDate} → {item.endDate}
+                  {item.name}:{" "}
+                  {item.startDate && item.endDate
+                    ? `${item.startDate} → ${item.endDate}`
+                    : "immer aktiv"}
                 </p>
                 <p className="mt-1">
                   {item.pricePerNight} €/Nacht · Studio +{item.studioSurchargePerNight} € ·

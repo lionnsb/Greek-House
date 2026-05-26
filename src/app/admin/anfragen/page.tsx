@@ -15,6 +15,7 @@ import {
   calculateSeasonalTotal
 } from "@/lib/seasonPricing";
 import type { SeasonDefinition } from "@/lib/seasonPricing";
+import { mapDbSeasons } from "@/lib/seasonStore";
 
 type ActionState = {
   loading: boolean;
@@ -107,16 +108,7 @@ export default function AdminAnfragenPage() {
         const data = await response.json();
         setSeasons(
           buildSeasonCatalog(
-            (data?.items ?? []).map((item: { name: string; startDate: string; endDate: string; pricePerNight: number; studioSurchargePerNight: number; minNights: number; createdAt?: string }) => ({
-              name: item.name,
-              start: item.startDate,
-              end: item.endDate,
-              pricePerNight: item.pricePerNight,
-              studioSurchargePerNight: item.studioSurchargePerNight,
-              minNights: item.minNights ?? 1,
-              createdAt: item.createdAt,
-              source: "admin" as const
-            }))
+            mapDbSeasons(data?.items ?? [])
           )
         );
       } catch {

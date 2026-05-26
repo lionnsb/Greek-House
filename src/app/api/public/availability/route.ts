@@ -3,6 +3,7 @@ import { addDays, format, parseISO } from "date-fns";
 import { reservationBlocksUntil } from "@/lib/bookingRules";
 import { dateKeysBetween } from "@/lib/date";
 import { buildSeasonCatalog } from "@/lib/seasonPricing";
+import { mapDbSeasons } from "@/lib/seasonStore";
 
 export const dynamic = "force-dynamic";
 
@@ -20,19 +21,21 @@ export async function GET() {
       .where("status", "in", ["HOLD", "ACCEPTED_AWAITING_PAYMENT", "CONFIRMED"])
       .get();
     const seasonsSnap = await adminDb.collection("pricing_seasons").get();
-    const seasons = seasonsSnap.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        name: data.name,
-        start: data.start_date,
-        end: data.end_date,
-        pricePerNight: data.price_per_night,
-        studioSurchargePerNight: data.studio_surcharge_per_night,
-        minNights: data.min_nights ?? 1,
-        createdAt: data.created_at,
-        source: "admin" as const
-      };
-    });
+    const seasons = mapDbSeasons(
+      seasonsSnap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name,
+          startDate: data.start_date ?? null,
+          endDate: data.end_date ?? null,
+          pricePerNight: data.price_per_night,
+          studioSurchargePerNight: data.studio_surcharge_per_night,
+          minNights: data.min_nights ?? 1,
+          createdAt: data.created_at
+        };
+      })
+    );
 
     const dayStatus: Record<string, "BLOCKED" | "HOLD" | "CONFIRMED"> = {};
     const now = new Date().toISOString();

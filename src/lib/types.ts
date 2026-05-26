@@ -52,8 +52,8 @@ export type AvailabilityBlock = {
 export type PricingSeason = {
   id: string;
   name: string;
-  startDate: string;
-  endDate: string;
+  startDate: string | null;
+  endDate: string | null;
   pricePerNight: number;
   studioSurchargePerNight: number;
   minNights: number;
