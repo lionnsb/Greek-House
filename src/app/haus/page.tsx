@@ -4,11 +4,15 @@ import { ImageGrid } from "@/components/ImageGrid";
 import { houseTopImages, houseGalleryImages } from "@/lib/imageSelection";
 
 const houseHighlights = [
-  "Exklusives Erdgeschoss-Apartment mit 80 m² Wohnfläche",
-  "Große Terrasse mit 30 m² Pool und Außendusche",
-  "Außenküche mit Gasgrill (Plancha)",
+  "Exklusives Apartment im Erdgeschoss mit ca. 80 m² Wohnfläche",
+  "Geräumiges Wohnzimmer mit offener Küche und Essplatz",
+  "Große Terrasse mit 30 m² Pool zur Alleinnutzung",
+  "Außenküche mit Gasgrill / Plancha",
   "Zwei Schlafzimmer und zwei Badezimmer",
-  "Separates Studio mit eigenem Bad zusätzlich buchbar"
+  "Klimaanlagen und Ventilatoren in jedem Zimmer",
+  "Separates Studio mit eigenem Bad",
+  "Zwei private Parkplätze direkt neben dem Eingang",
+  "Barrierearmer Zugang über eine Rampe zum Hauseingang"
 ];
 
 const studioHighlights = [
@@ -16,19 +20,19 @@ const studioHighlights = [
   "Separater Zugang über die Terrasse",
   "Doppelbett 140 x 200",
   "Klimaanlage und Standventilator",
-  "Zusätzlicher Stauraum hinter großen Schranktüren"
+  "Sonnenliegen"
 ];
 
 const rooms = [
   {
     title: "Kochen, Essen, Wohnen",
     description:
-      "Komplett ausgestattete Küche mit Nespresso-Maschine, Wasserkocher, Toaster, Geschirr und Kochutensilien. Dazu kommen Induktionsherd, Kühl-/Gefrierkombination, Backofen, Spülmaschine, Waschmaschine und eine Außenküche mit Gasgrill."
+      "Komplett ausgestattete Küche mit Nespresso-Maschine, Wasserkocher, Toaster, Geschirr und Kochutensilien. Dazu kommen Kühl-/Gefrierkombination, Backofen, Spülmaschine, Waschmaschine und eine Außenküche mit Gasgrill."
   },
   {
     title: "Master-Schlafzimmer",
     description:
-      "Zur Terrasse ausgerichtetes Schlafzimmer mit Doppelbett 160 x 200, offenem Einbauschrank, zusätzlichen Ablagen und programmierbarem Safe. Das zugehörige Duschbad liegt gegenüber auf der Flurseite."
+      "Zur Terrasse ausgerichtetes Schlafzimmer mit Doppelbett 160 x 200, offenem Einbauschrank, zusätzlichen Ablagen und programmierbarem Safe. Das zugehörige Duschbad ist gegenüber über den Flur erreichbar."
   },
   {
     title: "Zweites Schlafzimmer",
@@ -38,21 +42,24 @@ const rooms = [
   {
     title: "Bäder",
     description:
-      "Alle Badezimmer haben eine Toilette mit Bidet-Dusche, eine Regendusche mit Handbrause und einen Waschtisch mit Handseife. Für persönliche Kosmetika steht pro Gast ein Korb bereit."
+      "Alle Badezimmer haben eine Toilette mit Bidet-Handdusche, eine Regendusche mit Handbrause und einen Waschtisch mit Handseife. Für persönliche Kosmetika steht pro Gast ein Korb bereit."
   },
   {
     title: "Terrasse & Außenbereich",
     description:
-      "Großer Außenbereich mit gemütlicher Sitzecke, Meerblick, Außendusche und direktem Zugang zum Pool sowie zum Studio."
+      "Die großzügig überdachte Terrasse bietet einen geschützten Essbereich mit Meerblick und lädt zu entspannten Stunden im Freien ein. Sonnenliegen, Sonnenschirme und Poufs sorgen für zusätzlichen Komfort im Außenbereich."
   },
-  { title: "Pool", description: "30 m² großer Pool direkt an der Terrasse." }
+  {
+    title: "Pool",
+    description: "30 m² großer Pool direkt an der Terrasse. Eine Außendusche befindet sich direkt an der Terrasse."
+  }
 ];
 
 const amenities = [
   "Klimaanlage und Ventilatoren in Wohnzimmer, Schlafzimmern und Studio",
   "Fußbodenheizung im Haupthaus für kalte Tage",
   "Trinkwasser über separaten Hahn mit Filteranlage",
-  "Pro Gast liegen ein Handtuch, ein Duschtuch und ein Strandtuch bereit",
+  "Für unsere Gäste liegen Handtücher und Strandtücher bereit",
   "Wäscheschrank mit Waschmaschine, Waschmitteln, Körben, Wäscheständer und Klammern",
   "Programmierbarer Safe im Hauptschlafzimmer"
 ];
@@ -69,7 +76,14 @@ export default function HausPage() {
               Die Villa Mati tis Thalassas in Kastraki besteht aus zwei
               Apartments und einem Atelier, eingebettet in einen großen Garten.
               Das zu vermietende Apartment im Erdgeschoss bietet viel
-              Privatsphäre; Obergeschoss und Atelier werden privat genutzt.
+              Privatsphäre; das Obergeschoss und das Atelier werden privat
+              genutzt.
+            </p>
+            <p className="mt-3 text-base text-ink/70">
+              Das Apartment liegt im Erdgeschoss der Villa &quot;Mati tis
+              Thalassas&quot; in Kastraki. Großzügige Wohnbereiche, ruhige
+              Schlafzimmer, eine hochwertige Küche und einladende
+              Außenflächen bieten Platz für bis zu 7 Personen.
             </p>
             <ul className="mt-6 grid gap-3 text-sm text-ink/70">
               {houseHighlights.map((item) => (
@@ -194,7 +208,8 @@ export default function HausPage() {
             <li>Check-in ab 16:00 Uhr, Check-out bis 10:00 Uhr</li>
             <li>Nichtraucher-Apartmentbereich</li>
             <li><strong>KEINE HAUSTIERE.</strong></li>
-            <li>Rücksicht auf den privat genutzten Apartmentbereich im selben Haus</li>
+            <li>Kinder unter 2 Jahren sind auf Anfrage herzlich willkommen. Ein Kinderbett kann bei Bedarf bereitgestellt werden.</li>
+            <li>Bitte nehmen Sie Rücksicht auf die Nachbarn.</li>
           </ul>
         </div>
       </section>

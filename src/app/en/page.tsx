@@ -22,10 +22,9 @@ export default function HomePageEn() {
               Exclusive ground-floor apartment with large terrace, 30 m² pool and separate studio.
             </h1>
             <p className="mt-4 text-base text-ink/70">
-              Villa Mati tis Thalassas in Kastraki consists of two apartments
-              and an atelier, set in a large garden. The apartment for rent is
-              only 50 metres from the sea; the upper floor and the atelier are
-              privately used.
+              The ground-floor apartment with large terrace, 30 m² pool,
+              outdoor kitchen and separate studio is perfect for a relaxing
+              holiday with family or friends.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/en/verfuegbarkeit" className="btn">

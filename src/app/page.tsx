@@ -22,10 +22,9 @@ export default function HomePage() {
               Exklusives Apartment im Erdgeschoss mit großer Terrasse, 30 m² Pool und separatem Studio.
             </h1>
             <p className="mt-4 text-base text-ink/70">
-              Die Villa Mati tis Thalassas in Kastraki besteht aus zwei
-              Apartments und einem Atelier, eingebettet in einen großen Garten.
-              Das zu vermietende Apartment liegt nur 50 Meter vom Meer entfernt;
-              Obergeschoss und Atelier werden privat genutzt.
+              Das Apartment im Erdgeschoss mit großer Terrasse, 30 m² Pool,
+              Außenküche und separatem Studio ist perfekt für einen
+              entspannten Urlaub mit Familie oder Freunden.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/verfuegbarkeit" className="btn">

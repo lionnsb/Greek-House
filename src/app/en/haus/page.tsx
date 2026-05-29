@@ -4,11 +4,15 @@ import { ImageGrid } from "@/components/ImageGrid";
 import { houseTopImages, houseGalleryImages } from "@/lib/imageSelection";
 
 const houseHighlights = [
-  "Exclusive ground-floor apartment with 80 m² of living space",
-  "Large terrace with 30 m² pool and outdoor shower",
-  "Outdoor kitchen with gas grill (plancha)",
+  "Exclusive ground-floor apartment with approx. 80 m² of living space",
+  "Spacious living room with open kitchen and dining area",
+  "Large terrace with 30 m² pool for private use",
+  "Outdoor kitchen with gas grill / plancha",
   "Two bedrooms and two bathrooms",
-  "Separate studio with private bathroom available in addition"
+  "Air conditioning and fans in every room",
+  "Separate studio with private bathroom",
+  "Two private parking spaces directly next to the entrance",
+  "Barrier-reduced access via a ramp to the entrance"
 ];
 
 const studioHighlights = [
@@ -16,19 +20,19 @@ const studioHighlights = [
   "Separate access via the terrace",
   "Double bed 140 x 200",
   "Air conditioning and standing fan",
-  "Additional storage behind large cupboard doors"
+  "Sunbeds"
 ];
 
 const rooms = [
   {
     title: "Cooking, Dining, Living",
     description:
-      "Fully equipped kitchen with Nespresso machine, kettle, toaster, crockery and cooking utensils. It also includes an induction hob, fridge-freezer, oven, dishwasher, washing machine and an outdoor kitchen with gas grill."
+      "Fully equipped kitchen with Nespresso machine, kettle, toaster, crockery and cooking utensils. It also includes a fridge-freezer, oven, dishwasher, washing machine and an outdoor kitchen with gas grill."
   },
   {
     title: "Master Bedroom",
     description:
-      "Terrace-facing bedroom with double bed 160 x 200, built-in open wardrobe, additional shelves and a programmable safe. The matching shower bathroom is located across the hallway."
+      "Terrace-facing bedroom with double bed 160 x 200, built-in open wardrobe, additional shelves and a programmable safe. The matching shower bathroom is accessible across the hallway."
   },
   {
     title: "Second Bedroom",
@@ -38,21 +42,24 @@ const rooms = [
   {
     title: "Bathrooms",
     description:
-      "All bathrooms have a toilet with bidet shower, a rain shower with hand shower and a washbasin with hand soap. A basket for personal toiletries is provided for each guest."
+      "All bathrooms have a toilet with bidet hand shower, a rain shower with hand shower and a washbasin with hand soap. A basket for personal toiletries is provided for each guest."
   },
   {
     title: "Terrace & Outdoor Area",
     description:
-      "Large outdoor area with cosy lounge seating, sea view, outdoor shower and direct access to the pool and the studio."
+      "The generously covered terrace offers a sheltered dining area with sea view and invites you to relax outdoors. Sunbeds, parasols and poufs provide additional comfort in the outdoor area."
   },
-  { title: "Pool", description: "30 m² pool directly on the terrace." }
+  {
+    title: "Pool",
+    description: "30 m² pool directly on the terrace. An outdoor shower is located directly on the terrace."
+  }
 ];
 
 const amenities = [
   "Air conditioning and fans in the living room, bedrooms and studio",
   "Underfloor heating in the main house for colder days",
   "Drinking water via a separate filtered tap",
-  "One hand towel, one bath towel and one beach towel are provided per guest",
+  "Towels and beach towels are provided for our guests",
   "Laundry cupboard with washing machine, detergents, baskets, drying rack and pegs",
   "Programmable safe in the master bedroom"
 ];
@@ -70,6 +77,12 @@ export default function HousePageEn() {
               and an atelier, set in a large garden. The apartment for rent on
               the ground floor offers plenty of privacy; the upper floor and
               the atelier are privately used.
+            </p>
+            <p className="mt-3 text-base text-ink/70">
+              The apartment is located on the ground floor of Villa &quot;Mati
+              tis Thalassas&quot; in Kastraki. Spacious living areas, peaceful
+              bedrooms, a high-quality kitchen and inviting outdoor areas
+              accommodate up to 7 guests.
             </p>
             <ul className="mt-6 grid gap-3 text-sm text-ink/70">
               {houseHighlights.map((item) => (
@@ -191,7 +204,8 @@ export default function HousePageEn() {
             <li>Check-in from 16:00, check-out by 10:00</li>
             <li>Non-smoking apartment</li>
             <li><strong>NO PETS.</strong></li>
-            <li>Please respect the privately used apartment area in the same house</li>
+            <li>Children under 2 years are warmly welcome on request. A baby cot can be provided if needed.</li>
+            <li>Please be considerate of the neighbours.</li>
           </ul>
         </div>
       </section>
