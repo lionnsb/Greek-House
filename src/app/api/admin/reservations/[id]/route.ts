@@ -5,6 +5,7 @@ import {
   normalizeStudioSelection
 } from "@/lib/bookingRules";
 import { adminDb } from "@/lib/firebaseAdmin";
+import { loadHouseRulesAttachment } from "@/lib/houseRulesAttachment";
 import { requireAdmin } from "@/lib/adminAuth";
 import { sendAcceptedEmail, sendConfirmedEmail, sendRejectedEmail } from "@/lib/mailer";
 
@@ -142,12 +143,15 @@ export async function PATCH(request: Request, context: { params: { id: string } 
     }
 
     if (payload.status === "CONFIRMED") {
+      const houseRulesAttachment = await loadHouseRulesAttachment(new URL(request.url).origin);
+
       await sendConfirmedEmail({
         to: data?.email,
         name: data?.name,
         startDate: data?.start_date,
         endDate: data?.end_date,
         includesStudio: data?.includes_studio,
+        houseRulesAttachment,
         language: data?.language ?? "de"
       });
     }

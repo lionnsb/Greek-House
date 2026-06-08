@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
-import { calculateTotal } from "@/lib/pricing";
+import { calculateTotal } from "./pricing";
+import type { HouseRulesAttachment } from "./houseRulesAttachment";
 
 function formatMoney(amount: number) {
   return new Intl.NumberFormat("de-DE", {
@@ -159,6 +160,7 @@ export async function sendConfirmedEmail({
   startDate,
   endDate,
   includesStudio,
+  houseRulesAttachment,
   language = "de"
 }: {
   to: string;
@@ -166,6 +168,7 @@ export async function sendConfirmedEmail({
   startDate: string;
   endDate: string;
   includesStudio: boolean;
+  houseRulesAttachment: HouseRulesAttachment;
   language?: "de" | "en";
 }) {
   const transport = createTransport();
@@ -175,12 +178,14 @@ export async function sendConfirmedEmail({
       ? `Hello ${name},\n\n` +
         `your booking is confirmed.\n` +
         `Dates: ${startDate} to ${endDate}\n` +
-        `Studio: ${formatBool(includesStudio, "en")}\n\n` +
+        `Studio: ${formatBool(includesStudio, "en")}\n` +
+        `The house rules are attached as a PDF.\n\n` +
         `We look forward to welcoming you!\nMati tis Thalassas`
       : `Hallo ${name},\n\n` +
         `deine Buchung ist bestätigt.\n` +
         `Zeitraum: ${startDate} bis ${endDate}\n` +
-        `Studio: ${formatBool(includesStudio, "de")}\n\n` +
+        `Studio: ${formatBool(includesStudio, "de")}\n` +
+        `Die Hausregeln sind als PDF beigefügt.\n\n` +
         `Wir freuen uns auf deinen Aufenthalt!\nMati tis Thalassas`;
 
   const html =
@@ -192,6 +197,7 @@ export async function sendConfirmedEmail({
     <strong>Dates:</strong> ${startDate} to ${endDate}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "en")}
   </p>
+  <p>The house rules are attached as a PDF.</p>
   <p>We look forward to welcoming you!<br/>Mati tis Thalassas</p>
   `
       : `
@@ -201,6 +207,7 @@ export async function sendConfirmedEmail({
     <strong>Zeitraum:</strong> ${startDate} bis ${endDate}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "de")}
   </p>
+  <p>Die Hausregeln sind als PDF beigefügt.</p>
   <p>Wir freuen uns auf deinen Aufenthalt!<br/>Mati tis Thalassas</p>
   `;
 
@@ -209,7 +216,14 @@ export async function sendConfirmedEmail({
     to,
     subject,
     text,
-    html
+    html,
+    attachments: [
+      {
+        filename: houseRulesAttachment.filename,
+        content: Buffer.from(houseRulesAttachment.content),
+        contentType: houseRulesAttachment.contentType
+      }
+    ]
   });
 }
 

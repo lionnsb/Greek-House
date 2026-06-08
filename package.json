@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:pricing": "tsc -p tsconfig.test.json && node scripts/fix-test-imports.mjs && node --test .test-dist/tests/seasonPricing.test.js",
+    "test:pricing": "tsc -p tsconfig.test.json && node scripts/fix-test-imports.mjs && node --test .test-dist/tests/*.test.js",
     "deploy": "npm run cf:deploy",
     "preview": "npm run cf:preview",
     "cf:build": "npx @opennextjs/cloudflare@1.19.1 build --dangerouslyUseUnsupportedNextVersion",
