@@ -4,6 +4,8 @@ import {
   MAX_GUESTS,
   normalizeStudioSelection
 } from "@/lib/bookingRules";
+import { resolveBankAccount } from "@/lib/bankAccount";
+import { isCountryCode } from "@/lib/countries";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { loadHouseRulesAttachment } from "@/lib/houseRulesAttachment";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -95,45 +97,67 @@ export async function PATCH(request: Request, context: { params: { id: string } 
 
   const nextGuestsRaw = payload.guests ?? data?.guests;
   const nextGuests = Number(nextGuestsRaw);
+  const storedCountryCode = isCountryCode(data?.country_code) ? data.country_code : null;
+  const nextCountryCodeInput =
+    payload.countryCode === undefined ? storedCountryCode : payload.countryCode;
+
+  if (nextCountryCodeInput !== null && nextCountryCodeInput !== undefined && !isCountryCode(nextCountryCodeInput)) {
+    return NextResponse.json(
+      { message: "Ungültiges Land." },
+      { status: 400 }
+    );
+  }
   if (!isGuestCountValid(nextGuests)) {
     return NextResponse.json(
       { message: `Ungültige Gästeanzahl. Erlaubt sind 1-${MAX_GUESTS} Gäste.` },
       { status: 400 }
     );
   }
+  const nextCountryCode = nextCountryCodeInput ?? null;
   const nextIncludesStudio = normalizeStudioSelection(
     nextGuests,
     Boolean(payload.includesStudio ?? data?.includes_studio ?? false)
   );
+  const nextStartDate = payload.startDate ?? data?.start_date;
+  const nextEndDate = payload.endDate ?? data?.end_date;
+  const nextMessage = payload.message ?? data?.message ?? null;
+  const nextStatusValue = nextStatus ?? data?.status;
+  const nextPriceTotal = payload.priceTotal ?? data?.price_total ?? null;
+  const nextDepositAmount = payload.depositAmount ?? data?.deposit_amount ?? null;
+  const nextPaymentDueUntil = payload.paymentDueUntil ?? data?.payment_due_until ?? null;
+  const nextHoldUntil = payload.holdUntil ?? data?.hold_until ?? null;
 
   await docRef.update({
-    status: nextStatus ?? data?.status,
-    price_total: payload.priceTotal ?? data?.price_total ?? null,
-    deposit_amount: payload.depositAmount ?? data?.deposit_amount ?? null,
-    payment_due_until: payload.paymentDueUntil ?? data?.payment_due_until ?? null,
-    hold_until: payload.holdUntil ?? data?.hold_until ?? null,
-    start_date: payload.startDate ?? data?.start_date,
-    end_date: payload.endDate ?? data?.end_date,
+    status: nextStatusValue,
+    price_total: nextPriceTotal,
+    deposit_amount: nextDepositAmount,
+    payment_due_until: nextPaymentDueUntil,
+    hold_until: nextHoldUntil,
+    start_date: nextStartDate,
+    end_date: nextEndDate,
     guests: nextGuests,
     includes_studio: nextIncludesStudio,
-    message: payload.message ?? data?.message ?? null
+    country_code: nextCountryCode,
+    message: nextMessage
   });
 
   try {
     if (payload.status === "ACCEPTED_AWAITING_PAYMENT") {
+      const bankAccount = resolveBankAccount(nextCountryCode);
+
       await sendAcceptedEmail({
         to: data?.email,
         name: data?.name,
         reservationId: docRef.id,
-        priceTotal: payload.priceTotal ?? 0,
-        depositAmount: payload.depositAmount ?? null,
-        paymentDue: payload.paymentDueUntil,
-        iban: process.env.BANK_IBAN ?? "",
-        bic: process.env.BANK_BIC ?? "",
-        owner: process.env.BANK_OWNER ?? "",
-        startDate: data?.start_date,
-        endDate: data?.end_date,
-        includesStudio: data?.includes_studio ?? false,
+        priceTotal: nextPriceTotal ?? 0,
+        depositAmount: nextDepositAmount,
+        paymentDue: nextPaymentDueUntil,
+        iban: bankAccount.iban,
+        bic: bankAccount.bic,
+        owner: bankAccount.owner,
+        startDate: nextStartDate,
+        endDate: nextEndDate,
+        includesStudio: nextIncludesStudio,
         pricePerNight: Number(process.env.NEXT_PUBLIC_PRICE_PER_NIGHT ?? "0"),
         studioSurchargePerNight: Number(
           process.env.NEXT_PUBLIC_STUDIO_SURCHARGE_PER_NIGHT ?? "0"
@@ -148,9 +172,9 @@ export async function PATCH(request: Request, context: { params: { id: string } 
       await sendConfirmedEmail({
         to: data?.email,
         name: data?.name,
-        startDate: data?.start_date,
-        endDate: data?.end_date,
-        includesStudio: data?.includes_studio,
+        startDate: nextStartDate,
+        endDate: nextEndDate,
+        includesStudio: nextIncludesStudio,
         houseRulesAttachment,
         language: data?.language ?? "de"
       });
@@ -160,8 +184,8 @@ export async function PATCH(request: Request, context: { params: { id: string } 
       await sendRejectedEmail({
         to: data?.email,
         name: data?.name,
-        startDate: data?.start_date,
-        endDate: data?.end_date,
+        startDate: nextStartDate,
+        endDate: nextEndDate,
         language: data?.language ?? "de"
       });
     }

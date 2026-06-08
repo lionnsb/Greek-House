@@ -8,11 +8,14 @@ export type DayStatus = "FREE" | "BLOCKED" | "HOLD" | "CONFIRMED";
 
 export type DayStatusMap = Record<string, DayStatus>;
 
+export type CountryCode = "DE" | "AT" | "CH" | "OTHER";
+
 export type InquiryPayload = {
   startDate: string;
   endDate: string;
   guests: number;
   includesStudio: boolean;
+  countryCode: CountryCode;
   name: string;
   email: string;
   phone?: string;
@@ -33,6 +36,7 @@ export type Reservation = {
   guests: number;
   message?: string;
   includesStudio: boolean;
+  countryCode?: CountryCode | null;
   holdUntil?: string | null;
   priceTotal?: number | null;
   depositAmount?: number | null;

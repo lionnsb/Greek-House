@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { resolveBankAccount } from "@/lib/bankAccount";
+import { isCountryCode } from "@/lib/countries";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { sendPaymentReminderEmail } from "@/lib/mailer";
@@ -34,6 +36,10 @@ export async function POST(request: Request, context: { params: { id: string } }
   }
 
   try {
+    const bankAccount = resolveBankAccount(
+      isCountryCode(data?.country_code) ? data.country_code : null
+    );
+
     await sendPaymentReminderEmail({
       to: data?.email,
       name: data?.name,
@@ -42,6 +48,9 @@ export async function POST(request: Request, context: { params: { id: string } }
       paymentDue: data?.payment_due_until,
       reservationId: docRef.id,
       includesStudio: data?.includes_studio ?? false,
+      iban: bankAccount.iban,
+      bic: bankAccount.bic,
+      owner: bankAccount.owner,
       language: data?.language ?? "de"
     });
   } catch (error) {

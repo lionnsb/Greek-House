@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import type { InquiryPayload } from "@/lib/types";
+import { getCountryOptions } from "@/lib/countries";
+import type { CountryCode, InquiryPayload } from "@/lib/types";
 import type { SeasonDefinition } from "@/lib/seasonPricing";
 import { PricePreview } from "@/components/PricePreview";
 import {
@@ -15,11 +16,16 @@ import {
   normalizeStudioSelection
 } from "@/lib/bookingRules";
 
-const defaultValues: InquiryPayload = {
+type InquiryFormValues = Omit<InquiryPayload, "countryCode"> & {
+  countryCode: CountryCode | "";
+};
+
+const defaultValues: InquiryFormValues = {
   startDate: "",
   endDate: "",
   guests: 2,
   includesStudio: false,
+  countryCode: "",
   name: "",
   email: "",
   phone: "",
@@ -33,10 +39,11 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [seasons, setSeasons] = useState<SeasonDefinition[]>([]);
-  const { register, handleSubmit, reset, setValue, watch } = useForm<InquiryPayload>({
+  const { register, handleSubmit, reset, setValue, watch } = useForm<InquiryFormValues>({
     defaultValues
   });
   const router = useRouter();
+  const countryOptions = getCountryOptions(locale);
 
   const startDate = watch("startDate");
   const endDate = watch("endDate");
@@ -74,7 +81,7 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
     }
   }, [studioRequired, studioSelectable, includesStudio, setValue]);
 
-  async function onSubmit(payload: InquiryPayload) {
+  async function onSubmit(payload: InquiryFormValues) {
     setStatus("loading");
     setError(null);
     try {
@@ -170,7 +177,7 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
           />
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <div>
           <label className="label">{locale === "en" ? "Name" : "Name"}</label>
           <input type="text" className="input" {...register("name", { required: true })} />
@@ -178,6 +185,19 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
         <div>
           <label className="label">E-Mail</label>
           <input type="email" className="input" {...register("email", { required: true })} />
+        </div>
+        <div>
+          <label className="label">{locale === "en" ? "Country" : "Land"}</label>
+          <select className="input" defaultValue="" {...register("countryCode", { required: true })}>
+            <option value="" disabled>
+              {locale === "en" ? "Please select a country" : "Bitte Land wählen"}
+            </option>
+            {countryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2">

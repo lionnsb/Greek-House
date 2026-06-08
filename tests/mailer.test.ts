@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
 import nodemailer from "nodemailer";
 import type { HouseRulesAttachment } from "../src/lib/houseRulesAttachment.js";
-import { sendConfirmedEmail } from "../src/lib/mailer.js";
+import {
+  sendAcceptedEmail,
+  sendConfirmedEmail,
+  sendPaymentReminderEmail
+} from "../src/lib/mailer.js";
 
 type SentMail = {
   subject?: string;
@@ -34,6 +38,16 @@ function buildAttachment(): HouseRulesAttachment {
   };
 }
 
+function stubTransport(sentMessages: SentMail[]) {
+  nodemailer.createTransport = (() =>
+    ({
+      sendMail: async (message: SentMail) => {
+        sentMessages.push(message);
+        return { messageId: "test-message" };
+      }
+    })) as typeof nodemailer.createTransport;
+}
+
 afterEach(() => {
   process.env = { ...originalEnv };
   nodemailer.createTransport = originalCreateTransport;
@@ -44,13 +58,7 @@ describe("sendConfirmedEmail", () => {
     setSmtpEnv();
 
     const sentMessages: SentMail[] = [];
-    nodemailer.createTransport = (() =>
-      ({
-        sendMail: async (message: SentMail) => {
-          sentMessages.push(message);
-          return { messageId: "de-test" };
-        }
-      })) as typeof nodemailer.createTransport;
+    stubTransport(sentMessages);
 
     await sendConfirmedEmail({
       to: "gast@example.com",
@@ -83,13 +91,7 @@ describe("sendConfirmedEmail", () => {
     setSmtpEnv();
 
     const sentMessages: SentMail[] = [];
-    nodemailer.createTransport = (() =>
-      ({
-        sendMail: async (message: SentMail) => {
-          sentMessages.push(message);
-          return { messageId: "en-test" };
-        }
-      })) as typeof nodemailer.createTransport;
+    stubTransport(sentMessages);
 
     await sendConfirmedEmail({
       to: "guest@example.com",
@@ -111,5 +113,64 @@ describe("sendConfirmedEmail", () => {
       "mati-tis-thalassas-house-rules.pdf"
     );
     assert.equal(sentMessages[0]?.attachments?.[0]?.contentType, "application/pdf");
+  });
+});
+
+describe("payment emails", () => {
+  it("includes the provided Swiss bank account in the accepted email", async () => {
+    setSmtpEnv();
+    const sentMessages: SentMail[] = [];
+    stubTransport(sentMessages);
+
+    await sendAcceptedEmail({
+      to: "gast@example.com",
+      name: "Mati",
+      reservationId: "RES-CH-1",
+      priceTotal: 1250,
+      depositAmount: 400,
+      paymentDue: "2026-07-01",
+      iban: "CH93-0076-2011-6238-5295-7",
+      bic: "POFICHBEXXX",
+      owner: "Swiss Host",
+      startDate: "2026-08-01",
+      endDate: "2026-08-08",
+      includesStudio: false,
+      pricePerNight: 150,
+      studioSurchargePerNight: 0,
+      language: "de"
+    });
+
+    assert.equal(sentMessages.length, 1);
+    assert.match(sentMessages[0]?.text ?? "", /IBAN: CH93-0076-2011-6238-5295-7/);
+    assert.match(sentMessages[0]?.text ?? "", /BIC: POFICHBEXXX/);
+    assert.match(sentMessages[0]?.text ?? "", /Kontoinhaber: Swiss Host/);
+    assert.match(sentMessages[0]?.html ?? "", /IBAN: CH93-0076-2011-6238-5295-7/);
+  });
+
+  it("includes bank details in the German payment reminder", async () => {
+    setSmtpEnv();
+    const sentMessages: SentMail[] = [];
+    stubTransport(sentMessages);
+
+    await sendPaymentReminderEmail({
+      to: "gast@example.com",
+      name: "Mati",
+      startDate: "2026-09-10",
+      endDate: "2026-09-17",
+      paymentDue: "2026-08-15",
+      reservationId: "RES-DE-1",
+      includesStudio: true,
+      iban: "DE12-3456-7890-1234-5678-90",
+      bic: "GENODEF1XXX",
+      owner: "Default Host",
+      language: "de"
+    });
+
+    assert.equal(sentMessages.length, 1);
+    assert.match(sentMessages[0]?.text ?? "", /Bitte überweise auf folgendes Konto/);
+    assert.match(sentMessages[0]?.text ?? "", /IBAN: DE12-3456-7890-1234-5678-90/);
+    assert.match(sentMessages[0]?.text ?? "", /Kontoinhaber: Default Host/);
+    assert.match(sentMessages[0]?.html ?? "", /Kontodaten/);
+    assert.match(sentMessages[0]?.html ?? "", /GENODEF1XXX/);
   });
 });

@@ -24,6 +24,7 @@ export async function GET(request: Request) {
         name: data.name,
         email: data.email,
         phone: data.phone,
+        countryCode: data.country_code ?? null,
         guests: data.guests,
         message: data.message,
         includesStudio: data.includes_studio,

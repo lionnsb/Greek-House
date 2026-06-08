@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { resolveBankAccount } from "@/lib/bankAccount";
+import { isCountryCode } from "@/lib/countries";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { sendAcceptedEmail } from "@/lib/mailer";
@@ -53,6 +55,10 @@ export async function POST(request: Request) {
   });
 
   try {
+    const bankAccount = resolveBankAccount(
+      isCountryCode(data.country_code) ? data.country_code : null
+    );
+
     await sendAcceptedEmail({
       to: data.email,
       name: data.name,
@@ -60,9 +66,9 @@ export async function POST(request: Request) {
       priceTotal: payload.priceTotal,
       depositAmount: payload.depositAmount ?? null,
       paymentDue: payload.paymentDueUntil,
-      iban: process.env.BANK_IBAN ?? "",
-      bic: process.env.BANK_BIC ?? "",
-      owner: process.env.BANK_OWNER ?? "",
+      iban: bankAccount.iban,
+      bic: bankAccount.bic,
+      owner: bankAccount.owner,
       startDate: data.start_date,
       endDate: data.end_date,
       includesStudio: data.includes_studio ?? false,

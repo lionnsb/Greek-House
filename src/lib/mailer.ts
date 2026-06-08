@@ -357,6 +357,9 @@ export async function sendPaymentReminderEmail({
   paymentDue,
   reservationId,
   includesStudio,
+  iban,
+  bic,
+  owner,
   language = "de"
 }: {
   to: string;
@@ -366,6 +369,9 @@ export async function sendPaymentReminderEmail({
   paymentDue: string;
   reservationId: string;
   includesStudio: boolean;
+  iban: string;
+  bic: string;
+  owner: string;
   language?: "de" | "en";
 }) {
   const transport = createTransport();
@@ -380,6 +386,8 @@ export async function sendPaymentReminderEmail({
         `Dates: ${startDate} to ${endDate}\n` +
         `Studio: ${formatBool(includesStudio, "en")}\n` +
         `Payment due: ${paymentDue}\n` +
+        `Please transfer to:\n` +
+        `IBAN: ${iban}\nBIC: ${bic}\nAccount owner: ${owner}\n` +
         `Reference: ${reservationId}\n\n` +
         `Best regards\nMati tis Thalassas`
       : `Hallo ${name},\n\n` +
@@ -387,6 +395,8 @@ export async function sendPaymentReminderEmail({
         `Zeitraum: ${startDate} bis ${endDate}\n` +
         `Studio: ${formatBool(includesStudio, "de")}\n` +
         `Zahlungsfrist: ${paymentDue}\n` +
+        `Bitte überweise auf folgendes Konto:\n` +
+        `IBAN: ${iban}\nBIC: ${bic}\nKontoinhaber: ${owner}\n` +
         `Verwendungszweck: ${reservationId}\n\n` +
         `Viele Grüße\nMati tis Thalassas`;
 
@@ -399,6 +409,10 @@ export async function sendPaymentReminderEmail({
     <strong>Dates:</strong> ${startDate} to ${endDate}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "en")}<br/>
     <strong>Payment due:</strong> ${paymentDue}<br/>
+    <strong>Bank details</strong><br/>
+    IBAN: ${iban}<br/>
+    BIC: ${bic}<br/>
+    Account owner: ${owner}<br/>
     <strong>Reference:</strong> ${reservationId}
   </p>
   <p>Best regards<br/>Mati tis Thalassas</p>
@@ -410,6 +424,10 @@ export async function sendPaymentReminderEmail({
     <strong>Zeitraum:</strong> ${startDate} bis ${endDate}<br/>
     <strong>Studio:</strong> ${formatBool(includesStudio, "de")}<br/>
     <strong>Zahlungsfrist:</strong> ${paymentDue}<br/>
+    <strong>Kontodaten</strong><br/>
+    IBAN: ${iban}<br/>
+    BIC: ${bic}<br/>
+    Kontoinhaber: ${owner}<br/>
     <strong>Verwendungszweck:</strong> ${reservationId}
   </p>
   <p>Viele Grüße<br/>Mati tis Thalassas</p>

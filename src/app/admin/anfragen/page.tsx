@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Reservation } from "@/lib/types";
+import { getCountryLabel, getCountryOptions } from "@/lib/countries";
+import type { CountryCode, Reservation } from "@/lib/types";
 import { adminFetch } from "@/lib/adminFetch";
 import {
   isStudioRequired,
@@ -31,6 +32,7 @@ type FormValues = {
   endDate: string;
   guests: string;
   includesStudio: boolean;
+  countryCode: CountryCode | "";
   message: string;
 };
 
@@ -48,6 +50,7 @@ export default function AdminAnfragenPage() {
   const [editing, setEditing] = useState<Record<string, boolean>>({});
 
   const [seasons, setSeasons] = useState<SeasonDefinition[]>(buildSeasonCatalog([]));
+  const countryOptions = getCountryOptions("de");
 
   const sortedItems = useMemo(() => {
     return [...items].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
@@ -88,6 +91,7 @@ export default function AdminAnfragenPage() {
             includesStudio: studioRequired
               ? true
               : normalizeStudioSelection(Number(item.guests), item.includesStudio),
+            countryCode: item.countryCode ?? "",
             message: item.message ?? ""
           };
         });
@@ -209,6 +213,10 @@ export default function AdminAnfragenPage() {
                   typeof payload.includesStudio === "boolean"
                     ? payload.includesStudio
                     : item.includesStudio,
+                countryCode:
+                  typeof payload.countryCode === "string"
+                    ? (payload.countryCode as CountryCode)
+                    : item.countryCode ?? null,
                 message:
                   typeof payload.message === "string" ? payload.message : item.message
               }
@@ -383,6 +391,7 @@ export default function AdminAnfragenPage() {
             endDate: item.endDate,
             guests: item.guests?.toString() ?? "",
             includesStudio: item.includesStudio,
+            countryCode: item.countryCode ?? "",
             message: item.message ?? ""
           };
           const actionState = actions[item.id];
@@ -488,6 +497,7 @@ export default function AdminAnfragenPage() {
                             depositAmount: form.depositAmount
                               ? Number(form.depositAmount)
                               : null,
+                            countryCode: form.countryCode || undefined,
                             paymentDueUntil: form.paymentDueUntil || null
                           });
                         }}
@@ -606,6 +616,23 @@ export default function AdminAnfragenPage() {
                       }
                     />
                   </div>
+                  <div>
+                    <label className="label">Land</label>
+                    <select
+                      className="input"
+                      value={form.countryCode}
+                      onChange={(event) =>
+                        updateFormValue(item.id, "countryCode", event.target.value)
+                      }
+                    >
+                      <option value="">Nicht gesetzt</option>
+                      {countryOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   <div className="md:col-span-3">
                     <button
                       type="button"
@@ -620,6 +647,7 @@ export default function AdminAnfragenPage() {
                             guestCount,
                             form.includesStudio
                           ),
+                          countryCode: form.countryCode || undefined,
                           message: form.message
                         });
                       }}
@@ -696,6 +724,7 @@ export default function AdminAnfragenPage() {
               <div className="mt-4 text-xs text-ink/70">
                 <p>E-Mail: {item.email}</p>
                 <p>Telefon: {item.phone ?? "-"}</p>
+                <p>Land: {getCountryLabel(item.countryCode, "de")}</p>
                 <p>Gäste: {item.guests}</p>
                 <p>Studio: {item.includesStudio ? "ja" : "nein"}</p>
                 <p>Nachricht: {item.message ?? "-"}</p>

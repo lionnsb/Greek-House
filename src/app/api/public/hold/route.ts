@@ -7,6 +7,7 @@ import {
   normalizeStudioSelection,
   reservationBlocksUntil
 } from "@/lib/bookingRules";
+import { isCountryCode } from "@/lib/countries";
 import type { InquiryPayload } from "@/lib/types";
 import { buildSeasonCatalog, calculateSeasonalTotal } from "@/lib/seasonPricing";
 import { mapDbSeasons } from "@/lib/seasonStore";
@@ -26,6 +27,17 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as InquiryPayload;
     const guests = Number(payload.guests);
 
+    if (!isCountryCode(payload.countryCode)) {
+      return NextResponse.json(
+        {
+          message:
+            payload.language === "en"
+              ? "Please select a country."
+              : "Bitte ein Land auswählen."
+        },
+        { status: 400 }
+      );
+    }
     if (!payload.acceptPrivacy) {
       return NextResponse.json(
         {
@@ -142,6 +154,7 @@ export async function POST(request: Request) {
       name: payload.name,
       email: payload.email,
       phone: payload.phone ?? null,
+      country_code: payload.countryCode,
       guests,
       message: enrichedMessage,
       includes_studio: includesStudio,
