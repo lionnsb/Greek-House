@@ -16,7 +16,7 @@ export default function KontaktPage() {
             </div>
             <div className="card p-4">
               <p className="font-semibold text-ink">E-Mail</p>
-              <p className="mt-2">gollerdagmar@gmail.com</p>
+              <p className="mt-2">dagmar@naxos-apartment.com</p>
             </div>
             <div className="card p-4">
               <p className="font-semibold text-ink">Telefon / WhatsApp</p>

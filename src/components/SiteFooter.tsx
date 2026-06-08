@@ -9,6 +9,7 @@ const copy = {
     text: "Villa mit stilvollem Erdgeschoss-Apartment in Kastraki auf Naxos. Das Apartment mit Pool und optionalem Studio liegt nur 50 Meter vom Meer entfernt.",
     contactLabel: "Kontakt",
     legal: [
+      { href: "/agb", label: "AGB" },
       { href: "/impressum", label: "Impressum" },
       { href: "/datenschutz", label: "Datenschutz" }
     ]
@@ -18,6 +19,7 @@ const copy = {
     text: "Villa with a stylish ground-floor apartment in Kastraki, Naxos. The apartment with pool and optional studio is only 50 metres from the sea.",
     contactLabel: "Contact",
     legal: [
+      { href: "/en/agb", label: "Terms" },
       { href: "/en/impressum", label: "Imprint" },
       { href: "/en/datenschutz", label: "Privacy" }
     ]
@@ -42,7 +44,7 @@ export function SiteFooter() {
         </div>
         <div className="text-sm text-ink/70">
           <p>{t.contactLabel}</p>
-          <p className="mt-2">gollerdagmar@gmail.com</p>
+          <p className="mt-2">dagmar@naxos-apartment.com</p>
           <p>+41 76 329 92 88</p>
         </div>
         <div className="text-sm">

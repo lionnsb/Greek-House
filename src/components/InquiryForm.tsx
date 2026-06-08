@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -189,12 +190,36 @@ export function InquiryForm({ locale = "de" }: { locale?: "de" | "en" }) {
           <input type="text" className="input" {...register("message")} />
         </div>
       </div>
-      <label className="flex items-center gap-2 text-sm text-ink/70">
-        <input type="checkbox" className="h-4 w-4" {...register("acceptPrivacy", { required: true })} />
-        {locale === "en" ? "I accept the booking terms (AGB)." : "Ich akzeptiere die Buchungsbedingungen (AGB)."}
+      <label className="flex items-start gap-2 text-sm text-ink/70">
+        <input type="checkbox" className="mt-1 h-4 w-4 shrink-0" {...register("acceptPrivacy", { required: true })} />
+        <span>
+          {locale === "en" ? (
+            <>
+              I have read the{" "}
+              <Link href="/en/datenschutz" className="underline">
+                privacy policy
+              </Link>{" "}
+              and accept the{" "}
+              <Link href="/en/agb" className="underline">
+                booking terms (AGB)
+              </Link>.
+            </>
+          ) : (
+            <>
+              Ich habe die{" "}
+              <Link href="/datenschutz" className="underline">
+                Datenschutzerklärung
+              </Link>{" "}
+              zur Kenntnis genommen und akzeptiere die{" "}
+              <Link href="/agb" className="underline">
+                Buchungsbedingungen (AGB)
+              </Link>.
+            </>
+          )}
+        </span>
       </label>
-      <label className="flex items-center gap-2 text-sm text-ink/70">
-        <input type="checkbox" className="h-4 w-4" {...register("acceptHouseRules", { required: true })} />
+      <label className="flex items-start gap-2 text-sm text-ink/70">
+        <input type="checkbox" className="mt-1 h-4 w-4 shrink-0" {...register("acceptHouseRules", { required: true })} />
         {locale === "en"
           ? "I accept the house rules for the apartment."
           : "Ich akzeptiere die Hausregeln für das Apartment."}

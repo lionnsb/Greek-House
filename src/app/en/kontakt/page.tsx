@@ -16,7 +16,7 @@ export default function ContactPageEn() {
             </div>
             <div className="card p-4">
               <p className="font-semibold text-ink">E-mail</p>
-              <p className="mt-2">gollerdagmar@gmail.com</p>
+              <p className="mt-2">dagmar@naxos-apartment.com</p>
             </div>
             <div className="card p-4">
               <p className="font-semibold text-ink">Phone / WhatsApp</p>

@@ -27,11 +27,24 @@ export async function POST(request: Request) {
     const guests = Number(payload.guests);
 
     if (!payload.acceptPrivacy) {
-      return NextResponse.json({ message: "AGB müssen akzeptiert werden." }, { status: 400 });
+      return NextResponse.json(
+        {
+          message:
+            payload.language === "en"
+              ? "Privacy policy and booking terms must be accepted."
+              : "Datenschutzerklärung und Buchungsbedingungen müssen bestätigt werden."
+        },
+        { status: 400 }
+      );
     }
     if (!payload.acceptHouseRules) {
       return NextResponse.json(
-        { message: "Hausregeln müssen akzeptiert werden." },
+        {
+          message:
+            payload.language === "en"
+              ? "House rules must be accepted."
+              : "Hausregeln müssen akzeptiert werden."
+        },
         { status: 400 }
       );
     }
