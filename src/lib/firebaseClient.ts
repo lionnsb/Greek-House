@@ -6,7 +6,6 @@ const DEFAULT_PUBLIC_FIREBASE_CONFIG = {
   apiKey: "AIzaSyCnjlFpZu5s5j7uxfSsrEpAVNfSIOaFhDs",
   authDomain: "greek-house-cdf06.firebaseapp.com",
   projectId: "greek-house-cdf06",
-  storageBucket: "greek-house-cdf06.firebasestorage.app",
   messagingSenderId: "768056597788",
   appId: "1:768056597788:web:c2308f306c7ce8fab02ed9"
 } as const;
@@ -26,9 +25,6 @@ function getFirebaseConfig() {
     projectId:
       process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ??
       DEFAULT_PUBLIC_FIREBASE_CONFIG.projectId,
-    storageBucket:
-      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ??
-      DEFAULT_PUBLIC_FIREBASE_CONFIG.storageBucket,
     messagingSenderId:
       process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ??
       DEFAULT_PUBLIC_FIREBASE_CONFIG.messagingSenderId,

@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { ImageGrid } from "@/components/ImageGrid";
-import { homeGalleryImages, homeHeroImage } from "@/lib/imageSelection";
+import {
+  DEFAULT_SITE_IMAGES,
+  getSiteImagesForSection
+} from "@/lib/siteImages";
+import { getPublicSiteImages } from "@/lib/siteImagesStore";
+
+export const dynamic = "force-dynamic";
 
 const highlights = [
   "Nur 50 Meter zum Meer und zu einem kleinen Strand",
@@ -11,7 +17,16 @@ const highlights = [
   "Separates Studio mit eigenem Bad zusätzlich buchbar"
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const siteImages = await getPublicSiteImages();
+  const homeHeroImage =
+    getSiteImagesForSection(siteImages, "home-hero")[0] ??
+    getSiteImagesForSection(DEFAULT_SITE_IMAGES, "home-hero")[0];
+  const homeGalleryImages = getSiteImagesForSection(
+    siteImages,
+    "home-gallery"
+  );
+
   return (
     <div>
       <section className="section">
@@ -37,8 +52,8 @@ export default function HomePage() {
           </div>
           <div className="overflow-hidden rounded-2xl border border-stone bg-stone/40">
             <img
-              src={`/img/${homeHeroImage}`}
-              alt="Pool und Meerblick des Apartmentbereichs"
+              src={homeHeroImage.src}
+              alt={homeHeroImage.alt}
               className="h-full w-full object-cover"
             />
           </div>
@@ -67,7 +82,7 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="mt-6">
-            <ImageGrid files={homeGalleryImages} className="md:grid-cols-3" aspect="aspect-[4/3]" />
+            <ImageGrid images={homeGalleryImages} className="md:grid-cols-3" aspect="aspect-[4/3]" />
           </div>
         </div>
       </section>

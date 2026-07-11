@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { PlaceholderImage } from "@/components/PlaceholderImage";
 import { ImageGrid } from "@/components/ImageGrid";
-import { houseTopImages, houseGalleryImages } from "@/lib/imageSelection";
+import { SiteImageSlot } from "@/components/SiteImageSlot";
+import { getSiteImagesForSection } from "@/lib/siteImages";
+import { getPublicSiteImages } from "@/lib/siteImagesStore";
+
+export const dynamic = "force-dynamic";
 
 const houseHighlights = [
   "Exklusives Apartment im Erdgeschoss mit ca. 80 m² Wohnfläche",
@@ -64,7 +67,33 @@ const amenities = [
   "Programmierbarer Safe im Hauptschlafzimmer"
 ];
 
-export default function HausPage() {
+const locationImageLabels = [
+  "Strand Kastraki",
+  "Sahara Beach",
+  "Glyfada Beach",
+  "Insel Naxos"
+];
+
+export default async function HausPage() {
+  const siteImages = await getPublicSiteImages();
+  const houseTopImages = getSiteImagesForSection(siteImages, "house-top");
+  const roomFeatureImages = getSiteImagesForSection(
+    siteImages,
+    "room-features"
+  );
+  const houseGalleryImages = getSiteImagesForSection(
+    siteImages,
+    "house-gallery"
+  );
+  const studioGalleryImages = getSiteImagesForSection(
+    siteImages,
+    "studio-gallery"
+  );
+  const locationGalleryImages = getSiteImagesForSection(
+    siteImages,
+    "location-gallery"
+  );
+
   return (
     <div>
       <section className="section">
@@ -99,7 +128,7 @@ export default function HausPage() {
               </Link>
             </div>
           </div>
-          <ImageGrid files={houseTopImages} className="sm:grid-cols-2" aspect="aspect-square" />
+          <ImageGrid images={houseTopImages} className="sm:grid-cols-2" aspect="aspect-square" />
         </div>
       </section>
 
@@ -111,9 +140,12 @@ export default function HausPage() {
             Wohnen bis ans Meer verlängert.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {rooms.map((room) => (
+            {rooms.map((room, index) => (
               <div key={room.title} className="card p-6">
-                <PlaceholderImage label={room.title} />
+                <SiteImageSlot
+                  image={roomFeatureImages[index]}
+                  fallbackLabel={room.title}
+                />
                 <h3 className="mt-4 text-lg font-semibold">{room.title}</h3>
                 <p className="mt-2 text-sm text-ink/70">{room.description}</p>
               </div>
@@ -122,7 +154,7 @@ export default function HausPage() {
           <div className="mt-8">
             <h3 className="text-lg font-semibold">Galerie Apartmentbereich</h3>
             <div className="mt-4">
-              <ImageGrid files={houseGalleryImages} className="md:grid-cols-3" aspect="aspect-[4/3]" />
+              <ImageGrid images={houseGalleryImages} className="md:grid-cols-3" aspect="aspect-[4/3]" />
             </div>
           </div>
           <div className="mt-8 grid gap-3 text-sm text-ink/70 md:grid-cols-2">
@@ -156,12 +188,20 @@ export default function HausPage() {
               Betreuungspersonen.
             </p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <PlaceholderImage label="Studio Außen" />
-            <PlaceholderImage label="Studio Innen" />
-            <PlaceholderImage label="Studio Bad" />
-            <PlaceholderImage label="Studio Terrasse" />
-          </div>
+          {studioGalleryImages.length > 0 ? (
+            <ImageGrid
+              images={studioGalleryImages}
+              className="sm:grid-cols-2"
+              aspect="aspect-square"
+            />
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <SiteImageSlot fallbackLabel="Studio Außen" />
+              <SiteImageSlot fallbackLabel="Studio Innen" />
+              <SiteImageSlot fallbackLabel="Studio Bad" />
+              <SiteImageSlot fallbackLabel="Studio Terrasse" />
+            </div>
+          )}
         </div>
       </section>
 
@@ -191,10 +231,13 @@ export default function HausPage() {
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <PlaceholderImage label="Strand Kastraki" />
-            <PlaceholderImage label="Sahara Beach" />
-            <PlaceholderImage label="Glyfada Beach" />
-            <PlaceholderImage label="Insel Naxos" />
+            {locationImageLabels.map((label, index) => (
+              <SiteImageSlot
+                key={label}
+                image={locationGalleryImages[index]}
+                fallbackLabel={label}
+              />
+            ))}
           </div>
         </div>
       </section>

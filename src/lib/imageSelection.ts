@@ -1,4 +1,4 @@
-import { imageFiles } from "@/lib/images";
+import { imageFiles } from "./images";
 
 export const heroImages = imageFiles.slice(0, 4);
 export const homeHeroImage = "P1016961.JPG";

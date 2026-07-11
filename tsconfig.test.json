@@ -12,6 +12,9 @@
     "src/lib/pricing.ts",
     "src/lib/seasonPricing.ts",
     "src/lib/seasonStore.ts",
+    "src/lib/imageSelection.ts",
+    "src/lib/images.ts",
+    "src/lib/siteImages.ts",
     "tests/**/*.ts"
   ],
   "exclude": [

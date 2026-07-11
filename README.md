@@ -33,10 +33,26 @@ Public website + Admin-Dashboard für Anfragen, Verfügbarkeiten und Buchungen.
 - `reason`
 - `created_at`
 
+**site_images**
+- `section` (`home-hero` | `home-gallery` | `house-top` | `room-features` | `house-gallery` | `studio-gallery` | `location-gallery`)
+- `src`, `file_id`, `alt`
+- `sort_order`
+- `created_at`, `updated_at`
+
+**site_image_files**
+- `content_type`, `size`, `chunk_count`, `created_at`
+- Binärdaten liegen in der Unter-Collection `chunks`.
+
 ## Admin Auth
 - Firebase Auth (E-Mail + Passwort)
 - Server prüft Admins via `ADMIN_EMAILS` (kommagetrennt)
  - Admin-Benachrichtigungen via `ADMIN_NOTIFY_EMAILS` (optional)
+
+## Bildverwaltung
+- Unter `/admin/bilder` können Admins Bilder hochladen, ersetzen, löschen und sortieren.
+- Neue Bilder werden vor dem Upload im Browser verkleinert und in Blöcken direkt in Firestore gespeichert.
+- Die Bildverwaltung benötigt dadurch keinen separaten Storage-Bucket.
+- Beim ersten Öffnen der Bildverwaltung werden die bestehenden Bilder aus `public/img` als verwaltbare Firestore-Einträge übernommen.
 
 ## E-Mails
 Beim Setzen auf `ACCEPTED_AWAITING_PAYMENT` bzw. `CONFIRMED` werden E-Mails über SMTP versendet.

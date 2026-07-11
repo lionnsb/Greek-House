@@ -8,6 +8,7 @@ const adminNav = [
   { href: "/admin/anfragen", label: "Anfragen" },
   { href: "/admin/kalender", label: "Kalender" },
   { href: "/admin/preise", label: "Preise" },
+  { href: "/admin/bilder", label: "Bilder" },
   { href: "/admin/anreisen", label: "Anreisen" }
 ];
 
