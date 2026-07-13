@@ -127,6 +127,17 @@ export async function PATCH(request: Request, context: { params: { id: string } 
   const nextPaymentDueUntil = payload.paymentDueUntil ?? data?.payment_due_until ?? null;
   const nextHoldUntil = payload.holdUntil ?? data?.hold_until ?? null;
 
+  let acceptedBankAccount: ReturnType<typeof resolveBankAccount> | null = null;
+  if (payload.status === "ACCEPTED_AWAITING_PAYMENT") {
+    try {
+      acceptedBankAccount = resolveBankAccount(nextCountryCode);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Bankverbindung ist unvollständig.";
+      return NextResponse.json({ message }, { status: 500 });
+    }
+  }
+
   await docRef.update({
     status: nextStatusValue,
     price_total: nextPriceTotal,
@@ -143,8 +154,6 @@ export async function PATCH(request: Request, context: { params: { id: string } 
 
   try {
     if (payload.status === "ACCEPTED_AWAITING_PAYMENT") {
-      const bankAccount = resolveBankAccount(nextCountryCode);
-
       await sendAcceptedEmail({
         to: data?.email,
         name: data?.name,
@@ -152,9 +161,9 @@ export async function PATCH(request: Request, context: { params: { id: string } 
         priceTotal: nextPriceTotal ?? 0,
         depositAmount: nextDepositAmount,
         paymentDue: nextPaymentDueUntil,
-        iban: bankAccount.iban,
-        bic: bankAccount.bic,
-        owner: bankAccount.owner,
+        iban: acceptedBankAccount!.iban,
+        bic: acceptedBankAccount!.bic,
+        owner: acceptedBankAccount!.owner,
         startDate: nextStartDate,
         endDate: nextEndDate,
         includesStudio: nextIncludesStudio,

@@ -55,7 +55,9 @@ export async function POST(request: Request, context: { params: { id: string } }
     });
   } catch (error) {
     console.error("E-Mail konnte nicht gesendet werden", error);
-    return NextResponse.json({ message: "E-Mail Fehler" }, { status: 500 });
+    const message =
+      error instanceof Error ? error.message : "E-Mail konnte nicht gesendet werden.";
+    return NextResponse.json({ message }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

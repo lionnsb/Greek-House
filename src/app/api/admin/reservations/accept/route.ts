@@ -47,6 +47,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Nur HOLD kann angenommen werden." }, { status: 400 });
   }
 
+  let bankAccount: ReturnType<typeof resolveBankAccount>;
+  try {
+    bankAccount = resolveBankAccount(
+      isCountryCode(data.country_code) ? data.country_code : null
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Bankverbindung ist unvollständig.";
+    return NextResponse.json({ message }, { status: 500 });
+  }
+
   await docRef.update({
     status: "ACCEPTED_AWAITING_PAYMENT",
     price_total: payload.priceTotal,
@@ -55,10 +66,6 @@ export async function POST(request: Request) {
   });
 
   try {
-    const bankAccount = resolveBankAccount(
-      isCountryCode(data.country_code) ? data.country_code : null
-    );
-
     await sendAcceptedEmail({
       to: data.email,
       name: data.name,

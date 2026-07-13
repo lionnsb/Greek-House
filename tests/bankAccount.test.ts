@@ -40,9 +40,9 @@ describe("resolveBankAccount", () => {
   });
 
   it("uses the legacy BANK_* vars as default fallback", () => {
-    delete process.env.BANK_DEFAULT_IBAN;
-    delete process.env.BANK_DEFAULT_BIC;
-    delete process.env.BANK_DEFAULT_OWNER;
+    process.env.BANK_DEFAULT_IBAN = "";
+    process.env.BANK_DEFAULT_BIC = "";
+    process.env.BANK_DEFAULT_OWNER = "";
     process.env.BANK_IBAN = "legacy-iban";
     process.env.BANK_BIC = "legacy-bic";
     process.env.BANK_OWNER = "Legacy Owner";
@@ -52,5 +52,33 @@ describe("resolveBankAccount", () => {
       bic: "legacy-bic",
       owner: "Legacy Owner"
     });
+  });
+
+  it("rejects incomplete default bank details", () => {
+    process.env.BANK_DEFAULT_IBAN = "";
+    process.env.BANK_DEFAULT_BIC = "";
+    process.env.BANK_DEFAULT_OWNER = "";
+    process.env.BANK_IBAN = "";
+    process.env.BANK_BIC = "";
+    process.env.BANK_OWNER = "";
+
+    assert.throws(
+      () => resolveBankAccount("DE"),
+      /Bankverbindung für internationale Gäste ist unvollständig: IBAN, BIC, Kontoinhaber/
+    );
+  });
+
+  it("never falls back to the default account for Swiss guests", () => {
+    process.env.BANK_DEFAULT_IBAN = "GR-default-iban";
+    process.env.BANK_DEFAULT_BIC = "GR-default-bic";
+    process.env.BANK_DEFAULT_OWNER = "Default Owner";
+    process.env.BANK_CH_IBAN = "";
+    process.env.BANK_CH_BIC = "";
+    process.env.BANK_CH_OWNER = "";
+
+    assert.throws(
+      () => resolveBankAccount("CH"),
+      /Bankverbindung für Schweizer Gäste ist unvollständig/
+    );
   });
 });
