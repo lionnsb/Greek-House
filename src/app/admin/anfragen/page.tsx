@@ -180,8 +180,8 @@ export default function AdminAnfragenPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data?.message ?? "Aktion fehlgeschlagen");
       }
 
@@ -226,7 +226,11 @@ export default function AdminAnfragenPage() {
 
       setActions((prev) => ({
         ...prev,
-        [id]: { loading: false, error: null, success: "Gespeichert." }
+        [id]: {
+          loading: false,
+          error: typeof data?.warning === "string" ? data.warning : null,
+          success: data?.warning ? null : "Gespeichert."
+        }
       }));
     } catch (err) {
       setActions((prev) => ({
@@ -255,7 +259,7 @@ export default function AdminAnfragenPage() {
       }
       setActions((prev) => ({
         ...prev,
-        [id]: { loading: false, error: null, success: "Erinnerung gesendet." }
+        [id]: { loading: false, error: null, success: "Zahlungsmail gesendet." }
       }));
     } catch (err) {
       setActions((prev) => ({
@@ -517,14 +521,14 @@ export default function AdminAnfragenPage() {
                       >
                         Bestätigen
                       </button>
-                      {isOverdue && (
+                      {isAccepted && (
                         <button
                           className="btn-outline"
                           type="button"
                           onClick={() => sendPaymentReminder(item.id)}
                           disabled={actionState?.loading}
                         >
-                          Zahlung erinnern
+                          Zahlungsmail erneut senden
                         </button>
                       )}
                       {isConfirmed && (

@@ -12,6 +12,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { sendAcceptedEmail, sendConfirmedEmail, sendRejectedEmail } from "@/lib/mailer";
 
 export async function PATCH(request: Request, context: { params: { id: string } }) {
+  let emailWarning: string | null = null;
   try {
     await requireAdmin(request);
   } catch (error) {
@@ -200,9 +201,11 @@ export async function PATCH(request: Request, context: { params: { id: string } 
     }
   } catch (error) {
     console.error("E-Mail konnte nicht gesendet werden", error);
+    const reason = error instanceof Error ? error.message : "Unbekannter E-Mail-Fehler";
+    emailWarning = `Status gespeichert, aber E-Mail nicht versendet: ${reason}`;
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, warning: emailWarning });
 }
 
 export async function DELETE(request: Request, context: { params: { id: string } }) {

@@ -13,6 +13,7 @@ type AcceptPayload = {
 };
 
 export async function POST(request: Request) {
+  let emailWarning: string | null = null;
   try {
     await requireAdmin(request);
   } catch (error) {
@@ -87,7 +88,9 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Accepted E-Mail konnte nicht gesendet werden", error);
+    const reason = error instanceof Error ? error.message : "Unbekannter E-Mail-Fehler";
+    emailWarning = `Buchung angenommen, aber E-Mail nicht versendet: ${reason}`;
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, warning: emailWarning });
 }
