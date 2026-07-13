@@ -46,7 +46,7 @@ Public website + Admin-Dashboard für Anfragen, Verfügbarkeiten und Buchungen.
 ## Admin Auth
 - Firebase Auth (E-Mail + Passwort)
 - Server prüft Admins via `ADMIN_EMAILS` (kommagetrennt)
-- Admin-Benachrichtigungen und BCC-Kopien der Kunden-Statusmails via `ADMIN_NOTIFY_EMAILS` (optional)
+- Admin-Benachrichtigungen und BCC-Kopien der Kunden-Statusmails via `ADMIN_NOTIFY_EMAILS` (optional, Fallback: `SMTP_USER`)
 
 ## Bildverwaltung
 - Unter `/admin/bilder` können Admins Bilder hochladen, ersetzen, löschen und sortieren.

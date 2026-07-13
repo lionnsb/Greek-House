@@ -26,7 +26,7 @@ const originalCreateTransport = nodemailer.createTransport;
 function setSmtpEnv() {
   process.env.SMTP_HOST = "smtp.example.com";
   process.env.SMTP_PORT = "587";
-  process.env.SMTP_USER = "mailer";
+  process.env.SMTP_USER = "mailer@example.com";
   process.env.SMTP_PASS = "secret";
   process.env.SMTP_FROM = "Greek House <hello@example.com>";
   delete process.env.ADMIN_NOTIFY_EMAILS;
@@ -56,6 +56,25 @@ afterEach(() => {
 });
 
 describe("sendConfirmedEmail", () => {
+  it("uses the authenticated mailbox as copy recipient when no admin address is configured", async () => {
+    setSmtpEnv();
+
+    const sentMessages: SentMail[] = [];
+    stubTransport(sentMessages);
+
+    await sendConfirmedEmail({
+      to: "gast@example.com",
+      name: "Mati",
+      startDate: "2026-07-01",
+      endDate: "2026-07-08",
+      includesStudio: true,
+      houseRulesAttachment: buildAttachment(),
+      language: "de"
+    });
+
+    assert.deepEqual(sentMessages[0]?.bcc, ["mailer@example.com"]);
+  });
+
   it("sends an invisible copy to the configured admin recipients", async () => {
     setSmtpEnv();
     process.env.ADMIN_NOTIFY_EMAILS =

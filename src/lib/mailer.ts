@@ -16,10 +16,12 @@ function formatBool(value: boolean, locale: "de" | "en" = "de") {
 
 function getAdminCopyRecipients(customerEmail: string) {
   const customer = customerEmail.trim().toLowerCase();
+  const configuredRecipients =
+    process.env.ADMIN_NOTIFY_EMAILS?.trim() || process.env.SMTP_USER?.trim() || "";
 
   return Array.from(
     new Set(
-      (process.env.ADMIN_NOTIFY_EMAILS ?? "")
+      configuredRecipients
         .split(",")
         .map((email) => email.trim().toLowerCase())
         .filter((email) => email && email !== customer)

@@ -181,7 +181,10 @@ export async function POST(request: Request) {
       });
 
       const adminTargets =
-        process.env.ADMIN_NOTIFY_EMAILS ?? process.env.ADMIN_EMAILS ?? "";
+        process.env.ADMIN_NOTIFY_EMAILS?.trim() ||
+        process.env.SMTP_USER?.trim() ||
+        process.env.ADMIN_EMAILS ||
+        "";
       const recipients = adminTargets
         .split(",")
         .map((item) => item.trim())
