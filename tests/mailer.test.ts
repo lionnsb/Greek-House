@@ -12,6 +12,7 @@ type SentMail = {
   subject?: string;
   text?: string;
   html?: string;
+  bcc?: string[];
   attachments?: Array<{
     filename?: string;
     content?: Buffer;
@@ -28,6 +29,7 @@ function setSmtpEnv() {
   process.env.SMTP_USER = "mailer";
   process.env.SMTP_PASS = "secret";
   process.env.SMTP_FROM = "Greek House <hello@example.com>";
+  delete process.env.ADMIN_NOTIFY_EMAILS;
 }
 
 function buildAttachment(): HouseRulesAttachment {
@@ -54,6 +56,27 @@ afterEach(() => {
 });
 
 describe("sendConfirmedEmail", () => {
+  it("sends an invisible copy to the configured admin recipients", async () => {
+    setSmtpEnv();
+    process.env.ADMIN_NOTIFY_EMAILS =
+      "Dagmar@Naxos-Apartment.com, gast@example.com, dagmar@naxos-apartment.com";
+
+    const sentMessages: SentMail[] = [];
+    stubTransport(sentMessages);
+
+    await sendConfirmedEmail({
+      to: "gast@example.com",
+      name: "Mati",
+      startDate: "2026-07-01",
+      endDate: "2026-07-08",
+      includesStudio: true,
+      houseRulesAttachment: buildAttachment(),
+      language: "de"
+    });
+
+    assert.deepEqual(sentMessages[0]?.bcc, ["dagmar@naxos-apartment.com"]);
+  });
+
   it("attaches the PDF and adds the German note", async () => {
     setSmtpEnv();
 

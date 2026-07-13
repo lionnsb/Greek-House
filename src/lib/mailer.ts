@@ -14,6 +14,24 @@ function formatBool(value: boolean, locale: "de" | "en" = "de") {
   return value ? "ja" : "nein";
 }
 
+function getAdminCopyRecipients(customerEmail: string) {
+  const customer = customerEmail.trim().toLowerCase();
+
+  return Array.from(
+    new Set(
+      (process.env.ADMIN_NOTIFY_EMAILS ?? "")
+        .split(",")
+        .map((email) => email.trim().toLowerCase())
+        .filter((email) => email && email !== customer)
+    )
+  );
+}
+
+function getAdminBcc(customerEmail: string) {
+  const recipients = getAdminCopyRecipients(customerEmail);
+  return recipients.length > 0 ? recipients : undefined;
+}
+
 export function createTransport() {
   const host = process.env.SMTP_HOST;
   const port = Number(process.env.SMTP_PORT ?? "587");
@@ -148,6 +166,7 @@ export async function sendAcceptedEmail({
   await transport.sendMail({
     from: process.env.SMTP_FROM,
     to,
+    bcc: getAdminBcc(to),
     subject,
     text,
     html
@@ -214,6 +233,7 @@ export async function sendConfirmedEmail({
   await transport.sendMail({
     from: process.env.SMTP_FROM,
     to,
+    bcc: getAdminBcc(to),
     subject,
     text,
     html,
@@ -271,6 +291,7 @@ export async function sendRejectedEmail({
   await transport.sendMail({
     from: process.env.SMTP_FROM,
     to,
+    bcc: getAdminBcc(to),
     subject,
     text,
     html
@@ -436,6 +457,7 @@ export async function sendPaymentReminderEmail({
   await transport.sendMail({
     from: process.env.SMTP_FROM,
     to,
+    bcc: getAdminBcc(to),
     subject,
     text,
     html
