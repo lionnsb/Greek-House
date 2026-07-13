@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { adminFetch } from "@/lib/adminFetch";
 import {
+  compressImageForUpload,
+  parseImageAdminResponse
+} from "@/lib/adminImageUpload";
+import { MAX_IMAGE_UPLOAD_SIZE } from "@/lib/imageUploadLimits";
+import {
   getSiteImagesForSection,
   SITE_IMAGE_SECTION_CONFIGS,
   type SiteImage,
@@ -21,59 +26,6 @@ const PAGE_TABS: Array<{
   { id: "house", label: "Apartment", href: "/haus" },
   { id: "studio", label: "Studio", href: "/haus#studio" }
 ];
-
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_SOURCE_SIZE = 30 * 1024 * 1024;
-
-async function responseData(response: Response) {
-  return (await response.json()) as {
-    item?: SiteImage;
-    items?: SiteImage[];
-    message?: string;
-  };
-}
-
-async function optimizeImage(file: File) {
-  if (!ACCEPTED_TYPES.includes(file.type)) {
-    throw new Error("Erlaubt sind JPEG-, PNG- und WebP-Bilder.");
-  }
-  if (file.size > MAX_SOURCE_SIZE) {
-    throw new Error("Die Ausgangsdatei darf höchstens 30 MB groß sein.");
-  }
-  if (typeof createImageBitmap !== "function") {
-    return file;
-  }
-
-  try {
-    const bitmap = await createImageBitmap(file, {
-      imageOrientation: "from-image"
-    });
-    const maxEdge = 2400;
-    const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
-    const width = Math.max(1, Math.round(bitmap.width * scale));
-    const height = Math.max(1, Math.round(bitmap.height * scale));
-    const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext("2d");
-    if (!context) {
-      bitmap.close();
-      return file;
-    }
-
-    context.drawImage(bitmap, 0, 0, width, height);
-    bitmap.close();
-    const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, "image/webp", 0.84)
-    );
-    if (!blob) return file;
-
-    const baseName = file.name.replace(/\.[^.]+$/, "") || "bild";
-    return new File([blob], `${baseName}.webp`, { type: "image/webp" });
-  } catch {
-    return file;
-  }
-}
 
 function previewAspect(section: SiteImageSection) {
   if (section === "home-hero") return "aspect-[16/9]";
@@ -97,8 +49,8 @@ export default function AdminBilderPage() {
     setError(null);
     try {
       const response = await adminFetch("/api/admin/images");
-      const data = await responseData(response);
-      if (!response.ok) {
+      const data = await parseImageAdminResponse(response);
+      if (!response.ok || !data.items) {
         throw new Error(data.message ?? "Bilder konnten nicht geladen werden.");
       }
       const nextItems = data.items ?? [];
@@ -130,9 +82,11 @@ export default function AdminBilderPage() {
     setNotice(null);
 
     try {
-      const optimized = await optimizeImage(file);
-      if (optimized.size > 10 * 1024 * 1024) {
-        throw new Error("Das optimierte Bild ist noch größer als 10 MB.");
+      const optimized = await compressImageForUpload(file);
+      if (optimized.size > MAX_IMAGE_UPLOAD_SIZE) {
+        throw new Error(
+          "Das optimierte Bild ist noch zu groß. Bitte eine kleinere Datei auswählen."
+        );
       }
 
       const formData = new FormData();
@@ -147,7 +101,7 @@ export default function AdminBilderPage() {
         method: "POST",
         body: formData
       });
-      const data = await responseData(response);
+      const data = await parseImageAdminResponse(response);
       if (!response.ok || !data.item) {
         throw new Error(data.message ?? "Bild konnte nicht gespeichert werden.");
       }
@@ -180,7 +134,7 @@ export default function AdminBilderPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ alt: altDrafts[image.id] ?? "" })
       });
-      const data = await responseData(response);
+      const data = await parseImageAdminResponse(response);
       if (!response.ok || !data.item) {
         throw new Error(
           data.message ?? "Alternativtext konnte nicht gespeichert werden."
@@ -207,8 +161,8 @@ export default function AdminBilderPage() {
       const response = await adminFetch(`/api/admin/images/${image.id}`, {
         method: "DELETE"
       });
-      const data = await responseData(response);
-      if (!response.ok) {
+      const data = await parseImageAdminResponse(response);
+      if (!response.ok || data.ok !== true) {
         throw new Error(data.message ?? "Bild konnte nicht gelöscht werden.");
       }
       setItems((current) => current.filter((item) => item.id !== image.id));
@@ -270,8 +224,8 @@ export default function AdminBilderPage() {
           ids: reordered.map((item) => item.id)
         })
       });
-      const data = await responseData(response);
-      if (!response.ok) {
+      const data = await parseImageAdminResponse(response);
+      if (!response.ok || data.ok !== true) {
         throw new Error(
           data.message ?? "Sortierung konnte nicht gespeichert werden."
         );

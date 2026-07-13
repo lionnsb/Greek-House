@@ -14,6 +14,8 @@
     "src/lib/seasonStore.ts",
     "src/lib/imageSelection.ts",
     "src/lib/images.ts",
+    "src/lib/adminImageUpload.ts",
+    "src/lib/imageUploadLimits.ts",
     "src/lib/siteImages.ts",
     "tests/**/*.ts"
   ],

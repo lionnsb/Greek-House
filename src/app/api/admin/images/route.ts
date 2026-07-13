@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
 import { adminDb } from "@/lib/firebaseAdmin";
 import {
+  isAcceptedImageType,
+  MAX_IMAGE_UPLOAD_SIZE
+} from "@/lib/imageUploadLimits";
+import {
   deleteSiteImageFile,
   saveSiteImageFile
 } from "@/lib/siteImageFilesStore";
@@ -17,13 +21,6 @@ import {
   SITE_IMAGES_CACHE_TAG,
   SITE_IMAGES_COLLECTION
 } from "@/lib/siteImagesStore";
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = new Map([
-  ["image/jpeg", "jpg"],
-  ["image/png", "png"],
-  ["image/webp", "webp"]
-]);
 
 function errorResponse(error: unknown, fallback: string) {
   const message = error instanceof Error ? error.message : fallback;
@@ -127,18 +124,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const extension = ALLOWED_IMAGE_TYPES.get(file.type);
-    if (!extension) {
+    if (!isAcceptedImageType(file.type)) {
       return NextResponse.json(
         { message: "Erlaubt sind JPEG-, PNG- und WebP-Bilder." },
         { status: 400 }
       );
     }
 
-    if (file.size <= 0 || file.size > MAX_FILE_SIZE) {
+    if (file.size <= 0 || file.size > MAX_IMAGE_UPLOAD_SIZE) {
       return NextResponse.json(
-        { message: "Das Bild darf höchstens 10 MB groß sein." },
-        { status: 400 }
+        { message: "Das optimierte Bild darf höchstens 3,5 MB groß sein." },
+        { status: 413 }
       );
     }
 
