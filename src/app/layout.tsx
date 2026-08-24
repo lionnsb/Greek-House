@@ -6,7 +6,11 @@ import { SiteFooter } from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "Mati tis Thalassas",
   description:
-    "Apartment in Kastraki, Naxos – Verfügbarkeit prüfen und anfragen."
+    "Apartment in Kastraki, Naxos – Verfügbarkeit prüfen und anfragen.",
+  icons: {
+    icon: [{ url: "/mati-tis-thalassas-logo.png", type: "image/png" }],
+    apple: [{ url: "/mati-tis-thalassas-logo.png", type: "image/png" }]
+  }
 };
 
 export default function RootLayout({

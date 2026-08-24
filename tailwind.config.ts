@@ -12,7 +12,12 @@ const config: Config = {
         ink: "#0f172a",
         stone: "#e7e5e4",
         sand: "#f8fafc",
-        sea: "#0ea5a4"
+        sea: "#0ea5a4",
+        brand: {
+          DEFAULT: "#df6d32",
+          dark: "#9f421d",
+          soft: "#fcebe2"
+        }
       }
     }
   },

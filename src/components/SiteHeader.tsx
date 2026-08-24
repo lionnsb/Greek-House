@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BrandLogo } from "@/components/BrandLogo";
 
 const copy = {
   de: {
-    brand: "Mati tis Thalassas",
     cta: "Verfügbarkeit prüfen",
     nav: [
       { href: "/", label: "Start" },
@@ -18,7 +18,6 @@ const copy = {
     ]
   },
   en: {
-    brand: "Mati tis Thalassas",
     cta: "Check availability",
     nav: [
       { href: "/en", label: "Home" },
@@ -52,14 +51,18 @@ export function SiteHeader() {
   const other = toOtherLang(pathname);
 
   return (
-    <header className="border-b border-stone bg-white/80 backdrop-blur">
-      <div className="container flex items-center justify-between py-6">
-        <Link href={lang === "en" ? "/en" : "/"} className="text-lg font-semibold tracking-tight">
-          {t.brand}
+    <header className="border-b border-brand/20 bg-white/85 backdrop-blur">
+      <div className="container flex items-center justify-between gap-6 py-4">
+        <Link
+          href={lang === "en" ? "/en" : "/"}
+          aria-label={lang === "en" ? "Mati tis Thalassas home" : "Mati tis Thalassas Startseite"}
+          className="shrink-0"
+        >
+          <BrandLogo className="h-20 w-auto sm:h-24" priority />
         </Link>
         <nav className="hidden items-center gap-6 md:flex">
           {t.nav.map((item) => (
-            <Link key={item.href} href={item.href} className="text-sm text-ink/80 hover:text-ink">
+            <Link key={item.href} href={item.href} className="text-sm text-ink/80 transition hover:text-brand-dark">
               {item.label}
             </Link>
           ))}
