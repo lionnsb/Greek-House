@@ -10,10 +10,6 @@ body {
   @apply bg-sand text-ink;
 }
 
-::selection {
-  @apply bg-brand/25 text-ink;
-}
-
 .container {
   @apply mx-auto w-full max-w-6xl px-6;
 }
@@ -23,15 +19,15 @@ body {
 }
 
 .card {
-  @apply rounded-2xl border border-brand/15 bg-white shadow-sm;
+  @apply rounded-2xl border border-stone bg-white shadow-sm;
 }
 
 .badge {
-  @apply inline-flex items-center rounded-full border border-brand/30 bg-brand-soft px-3 py-1 text-sm font-medium text-brand-dark;
+  @apply inline-flex items-center rounded-full border border-stone px-3 py-1 text-sm;
 }
 
 .input {
-  @apply w-full rounded-xl border border-stone bg-white px-4 py-3 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/10;
+  @apply w-full rounded-xl border border-stone bg-white px-4 py-3 text-sm shadow-sm focus:border-ink focus:outline-none;
 }
 
 .input-currency {
@@ -47,11 +43,15 @@ body {
 }
 
 .btn {
-  @apply inline-flex items-center justify-center rounded-xl bg-brand px-6 py-3 text-sm font-semibold text-ink shadow-sm transition hover:bg-brand-dark hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25;
+  @apply inline-flex items-center justify-center rounded-xl bg-ink px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink/20;
+}
+
+.btn-accent {
+  @apply bg-brand text-white hover:bg-brand-dark;
 }
 
 .btn-outline {
-  @apply inline-flex items-center justify-center rounded-xl border border-brand px-6 py-3 text-sm font-semibold text-brand-dark transition hover:bg-brand hover:text-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20;
+  @apply inline-flex items-center justify-center rounded-xl border border-ink px-6 py-3 text-sm font-semibold text-ink transition hover:bg-ink hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ink/20;
 }
 
 .btn:disabled,
@@ -61,5 +61,5 @@ body {
 }
 
 .link {
-  @apply text-brand-dark underline decoration-brand/40 underline-offset-4 transition hover:text-brand hover:decoration-brand;
+  @apply text-ink underline decoration-stone underline-offset-4 hover:decoration-ink;
 }

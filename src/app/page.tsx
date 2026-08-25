@@ -42,7 +42,7 @@ export default async function HomePage() {
               entspannten Urlaub mit Familie oder Freunden.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/verfuegbarkeit" className="btn">
+              <Link href="/verfuegbarkeit" className="btn btn-accent">
                 Verfügbarkeit prüfen
               </Link>
               <Link href="/haus" className="btn-outline">

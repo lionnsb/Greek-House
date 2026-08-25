@@ -35,7 +35,7 @@ export function SiteFooter() {
   const t = copy[lang];
 
   return (
-    <footer className="border-t border-brand/25 bg-white">
+    <footer className="border-t border-stone bg-white">
       <div className="container grid gap-6 py-10 md:grid-cols-3">
         <div>
           <Link
@@ -54,11 +54,11 @@ export function SiteFooter() {
         </div>
         <div className="text-sm">
           {t.legal.map((item) => (
-            <Link key={item.href} href={item.href} className="block text-ink/70 transition hover:text-brand-dark">
+            <Link key={item.href} href={item.href} className="block text-ink/70 hover:text-ink">
               {item.label}
             </Link>
           ))}
-          <Link href="/admin" className="mt-2 block text-ink/70 transition hover:text-brand-dark">
+          <Link href="/admin" className="mt-2 block text-ink/70 hover:text-ink">
             Admin
           </Link>
         </div>

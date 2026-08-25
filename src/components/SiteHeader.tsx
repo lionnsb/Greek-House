@@ -51,7 +51,7 @@ export function SiteHeader() {
   const other = toOtherLang(pathname);
 
   return (
-    <header className="border-b border-brand/20 bg-white/85 backdrop-blur">
+    <header className="border-b border-stone bg-white/80 backdrop-blur">
       <div className="container flex items-center justify-between gap-6 py-4">
         <Link
           href={lang === "en" ? "/en" : "/"}
@@ -62,13 +62,13 @@ export function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-6 md:flex">
           {t.nav.map((item) => (
-            <Link key={item.href} href={item.href} className="text-sm text-ink/80 transition hover:text-brand-dark">
+            <Link key={item.href} href={item.href} className="text-sm text-ink/80 hover:text-ink">
               {item.label}
             </Link>
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <Link href={lang === "en" ? "/en/verfuegbarkeit" : "/verfuegbarkeit"} className="btn hidden md:inline-flex">
+          <Link href={lang === "en" ? "/en/verfuegbarkeit" : "/verfuegbarkeit"} className="btn btn-accent hidden md:inline-flex">
             {t.cta}
           </Link>
         </div>

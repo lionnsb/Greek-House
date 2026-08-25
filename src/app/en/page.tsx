@@ -42,7 +42,7 @@ export default async function HomePageEn() {
               holiday with family or friends.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/en/verfuegbarkeit" className="btn">
+              <Link href="/en/verfuegbarkeit" className="btn btn-accent">
                 Check availability
               </Link>
               <Link href="/en/haus" className="btn-outline">

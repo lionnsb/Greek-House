@@ -120,7 +120,7 @@ export default async function HausPage() {
               ))}
             </ul>
             <div className="mt-6 flex gap-4">
-              <Link href="/verfuegbarkeit" className="btn">
+              <Link href="/verfuegbarkeit" className="btn btn-accent">
                 Verfügbarkeit prüfen
               </Link>
               <Link href="/kontakt" className="btn-outline">

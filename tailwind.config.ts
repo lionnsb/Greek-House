@@ -14,9 +14,8 @@ const config: Config = {
         sand: "#f8fafc",
         sea: "#0ea5a4",
         brand: {
-          DEFAULT: "#df6d32",
-          dark: "#9f421d",
-          soft: "#fcebe2"
+          DEFAULT: "#c1541a",
+          dark: "#8b3e16"
         }
       }
     }
